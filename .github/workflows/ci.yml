@@ -1,0 +1,45 @@
+# Her push/PR'de: tip denetimi, derleme, birim testleri, gerçek veritabanlarına karşı entegrasyon testleri
+# (PostgreSQL, SQL Server, MySQL, MariaDB konteynerleri docker CLI ile açılır) ve Electron duman testi.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['v*']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+      - name: Veritabanı görüntülerini çek
+        run: |
+          for i in postgres:16-alpine mysql:8.4 mariadb:11 mcr.microsoft.com/mssql/server:2022-latest; do docker pull -q "$i" & done; wait
+      - name: Entegrasyon testleri
+        run: npm run test:integration
+        env:
+          CI: 'true'
+      - name: Electron duman testi (geliştirme hesabıyla)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb > /dev/null
+          docker run -d --rm --name sqlm-pg -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=shop -p 127.0.0.1:55432:5432 postgres:16-alpine
+          for i in $(seq 1 30); do docker exec sqlm-pg pg_isready -U postgres && break; sleep 1; done
+          sleep 2
+          docker exec sqlm-pg psql -U postgres -d shop -c "create table customers (id serial primary key, name text not null, country char(2), email text, created timestamptz default now()); create table orders (id serial primary key, customer_id int references customers(id), total numeric(12,2), status text); insert into customers(name,country,email) select 'Müşteri '||g, (array['TR','DE','US','FR'])[1+g%4], 'm'||g||'@ornek.com' from generate_series(1,500) g; insert into orders(customer_id,total,status) select 1+(g%500), (g*13%1000)/3.0, 'paid' from generate_series(1,3000) g; create view big_orders as select * from orders where total > 200;"
+          SQLM_SHOTS=e2e-shots xvfb-run -a -s "-screen 0 1600x1000x24" node tests/e2e/smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-ekran-goruntuleri
+          path: e2e-shots/
+          retention-days: 7

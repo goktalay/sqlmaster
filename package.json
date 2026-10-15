@@ -32,9 +32,9 @@
       "package.json"
     ],
     "asarUnpack": [
-      "**/node_modules/@duckdb/**",
-      "**/node_modules/better-sqlite3/**"
+      "**/node_modules/@duckdb/**"
     ],
+    "npmRebuild": false,
     "win": {
       "icon": "build/icon.ico",
       "target": [
