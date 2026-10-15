@@ -76,4 +76,4 @@ hesabı kullanılabilir; paketlenmiş exe'de bu yol kapalıdır.
 
 NSIS + portable; artefakt adları `SQL-Master-Setup-<v>.exe` / `SQL-Master-Portable-<v>.exe`.
 `build/installer.nsh` SSH Master'dan birebir alındı (main 5cc0578): Mastertool ortak kurulum klasörü ve
-Başlat menüsü kategorisi.
+Başlat menüsü kategorisi ("Master Tool", kullanıcı kararı; kurulum klasörü Mastertool).
