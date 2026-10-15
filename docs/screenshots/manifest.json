@@ -1,0 +1,74 @@
+[
+  {
+    "file": "01-ana-ekran-gece.png",
+    "theme": "dark",
+    "title": "Bağlantı kartları",
+    "caption": "Tüm veritabanlarınız kartlar halinde; klasörlere sürükleyip düzenleyin"
+  },
+  {
+    "file": "02-ana-ekran-gunduz.png",
+    "theme": "light",
+    "title": "Bağlantı kartları (gündüz)",
+    "caption": "Gece, gündüz ya da sistem teması — tek tıkla"
+  },
+  {
+    "file": "03-baglanti-formu-gece.png",
+    "theme": "dark",
+    "title": "Bağlantı formu",
+    "caption": "Bağlantıyı deneyin: sürüm, TLS durumu ve kullanıcı anında görünür"
+  },
+  {
+    "file": "04-tablo-verisi-gece.png",
+    "theme": "dark",
+    "title": "Şema gezgini ve tablo verisi",
+    "caption": "Kolon gizle, sırala, filtrele — veriyi çeken SQL anında güncellenir"
+  },
+  {
+    "file": "05-tablo-verisi-gunduz.png",
+    "theme": "light",
+    "title": "Şema gezgini ve tablo verisi (gündüz)",
+    "caption": "Tablolar, görünümler, fonksiyonlar, trigger’lar: ihtiyaç anında yüklenir"
+  },
+  {
+    "file": "06-sql-editor-gece.png",
+    "theme": "dark",
+    "title": "SQL editörü",
+    "caption": "Ctrl+Enter ile çalıştırın; çoklu sonuç, otomatik tamamlama, iptal"
+  },
+  {
+    "file": "07-sql-editor-gunduz.png",
+    "theme": "light",
+    "title": "SQL editörü (gündüz)",
+    "caption": "Sözdizimi renklendirme ve tablo/kolon tamamlama"
+  },
+  {
+    "file": "08-sorgu-olusturucu-gece.png",
+    "theme": "dark",
+    "title": "Görsel sorgu oluşturucu",
+    "caption": "Tabloları sürükleyin, JOIN’leri çizin; SQL canlı oluşur ve çalışır"
+  },
+  {
+    "file": "09-ddl-goruntuleyici-gece.png",
+    "theme": "dark",
+    "title": "Kod ve DDL görüntüleyici",
+    "caption": "Fonksiyon, prosedür, trigger ve görünüm tanımları renkli editörde"
+  },
+  {
+    "file": "10-duckdb-dosyalar-gece.png",
+    "theme": "dark",
+    "title": "CSV, Parquet, JSON ve Excel",
+    "caption": "DuckDB ile dosyaları içe aktarmadan doğrudan SQL ile sorgulayın"
+  },
+  {
+    "file": "11-ayarlar-gece.png",
+    "theme": "dark",
+    "title": "Ayarlar",
+    "caption": "8 dil, tema, başlangıç, Mastertool hesabı ve şifreli senkron"
+  },
+  {
+    "file": "12-salt-okunur-gece.png",
+    "theme": "dark",
+    "title": "Salt okunur mod",
+    "caption": "Veriyi değiştiren komutlar çalışmadan önce onayınızı ister"
+  }
+]
