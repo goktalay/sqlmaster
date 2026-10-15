@@ -11,7 +11,7 @@ import type { ExportFormat } from '../core/engine/export';
 import { createServices, type Services } from './container';
 import { secretRef } from './store';
 import { DbHost } from './dbhost-client';
-import { WEB_BASE, WEB_PAGES } from './account/mastertool';
+import { MASTERTOOL_URL, WEB_BASE, WEB_PAGES } from './account/mastertool';
 import { friendlyError } from './errors';
 
 const ROOT = path.join(__dirname, '..');
@@ -262,7 +262,9 @@ function registerIpc() {
   });
   // Hesap sayfaları varsayılan tarayıcıda açılır (yalnız bu adresler)
   ipcMain.handle('account:openWeb', (_e, p: string) => {
-    if (WEB_PAGES[p]) void shell.openExternal(WEB_BASE + WEB_PAGES[p]);
+    const q = new URLSearchParams({ app: 'sq', lang: currentLang(), theme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' });
+    if (p === 'mastertool') { q.delete('app'); void shell.openExternal(`${MASTERTOOL_URL}?${q}`); }
+    else if (WEB_PAGES[p]) void shell.openExternal(`${WEB_BASE}${WEB_PAGES[p]}?${q}`);
   });
 
   // --- Bağlantılar ve klasörler -----------------------------------------------------

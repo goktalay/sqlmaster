@@ -54,6 +54,12 @@ describe('end-to-end encrypted library', () => {
     expect(() => decryptLibrary(b.encKey, blob)).toThrow('decrypt_failed');
   });
 
+  it('matches the server contract test vector (sqlm-enc-v1)', async () => {
+    const k = await deriveKeys('Test1234!', { alg: 'PBKDF2-SHA256', salt: 'AAECAwQFBgcICQoLDA0ODw==', iter: 310000 });
+    expect(k.authHash).toBe('mLBQ6HQqD19kX/VavErWYq+7tM4mCmGfic7GuQQlBMY=');
+    expect(k.encKey.subarray(0, 8).toString('hex')).toBe('69fa902720ef92b1');
+  });
+
   it('merges by updated_at, rev, then device; drops old tombstones', () => {
     const it = (id: string, updated_at: number, rev = 1, device = 'a', deleted = false): SyncItem => ({ id, kind: 'connection', updated_at, rev, device, deleted, data: deleted ? null : { v: `${id}-${updated_at}-${device}` } });
     const now = 100 * 864e5;

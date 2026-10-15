@@ -5,6 +5,7 @@ import type { PublicStore } from '../../shared/types';
 import { api } from '../lib/api';
 import { $, confirmBox, esc, h, icon, openModal, prompt, t, toast } from '../lib/ui';
 import { openSettings, themeButton } from '../lib/settings';
+import { mastertoolButton } from '../lib/mastertool';
 import { dialectOf, makeCompletion, resetCompletion, type Ctx, type Tab } from './context';
 import { ObjectTree } from './tree';
 import { createSqlTab } from './sqlTab';
@@ -60,6 +61,7 @@ async function main() {
   $('#btnSettings').innerHTML = icon('gear');
   $('#btnSettings').title = t('app.settings');
   themeButton($('#btnTheme'));
+  $('.bar-actions').appendChild(mastertoolButton());
   $('#btnNewSql').onclick = () => ctx.openSql();
   $('#btnBuilder').onclick = () => ctx.openBuilder();
   $('#btnReconnect').onclick = () => void connect();

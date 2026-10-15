@@ -19,8 +19,8 @@ Durum: ✅ tamam · 🟡 kısmen · ⏳ sırada
 ## Aşama 2 — Diğer P0 sağlayıcılar ✅
 - SQL Server, MySQL/MariaDB, SQLite, DuckDB (CSV/Parquet/JSON/Excel)
 
-## Aşama 3 — Hesap ve senkron 🟡
-- İstemci tarafı hazır (soyut arayüz + /api/sq varsayımlı istemci); sunucu sözleşmesi bekleniyor
+## Aşama 3 — Hesap ve senkron ✅ (gerçek hesapla uçtan uca deneme bekliyor)
+- Sözleşme v1 doğrulandı (test vektörü birim testinde); sunucu canlı; sağ üstte Mastertool düğmesi
 
 ## Aşama 4 — P1 ⏳
 - Oracle (oracledb thin), ClickHouse, Snowflake, ODBC; SFTP/S3 dosya kaynakları; kayıt düzenleme (ızgarada INSERT/UPDATE); şema karşılaştırma

@@ -5,6 +5,7 @@ import type { ProviderId, SslMode } from '../../core/provider';
 import { api } from '../lib/api';
 import { $, $$, confirmBox, contextMenu, esc, h, icon, LANG, openModal, prompt, t, toast } from '../lib/ui';
 import { acct, logout, onAcct, openSettings, syncText, themeButton } from '../lib/settings';
+import { mastertoolButton } from '../lib/mastertool';
 
 const COLORS = ['#22d3ee', '#3b82f6', '#6366f1', '#a855f7', '#ec4899', '#f97316', '#fbbf24', '#34d399', '#94a3b8'];
 const DND = 'application/x-sqlm';
@@ -22,6 +23,7 @@ $('#btnNewFolder').innerHTML = icon('folderPlus') + esc(t('common.newFolder'));
 $('#btnNewConn').innerHTML = icon('plus') + esc(t('app.newConn'));
 $<HTMLInputElement>('#search').placeholder = t('app.searchPh');
 themeButton($('#btnTheme'));
+$('.actions').appendChild(mastertoolButton());
 
 $('#btnSettings').onclick = () => openSettings(data.settings);
 $('#content').addEventListener('mousedown', (e) => {

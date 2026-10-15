@@ -1,5 +1,5 @@
 // Mastertool hesabı + uçtan uca şifreli kütüphane senkronu (SSH Master v1.2 / FTP Masters v1.1 ile aynı model).
-// Uçlar varsayılan olarak /api/sq/* (sözleşme HEPGO sunucu oturumundan kesinleşecek; bkz. docs/account-contract.md).
+// Uçlar /api/sq/* — Mastertool sözleşmesi v1 (docs/account-contract.md).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -12,8 +12,10 @@ import type { LibraryAdapter } from './library';
 
 export const API_BASE = process.env.SQLM_API || 'https://sqlmaster.app';
 export const API_PREFIX = '/api/sq';
-export const WEB_BASE = process.env.SQLM_WEB || 'https://mastertool.download';
+// Hesap sayfaları sqlmaster.app üzerinden açılır; sunucu ?app=sq ile mastertool.download'a (SQL Master markalı) yönlendirir
+export const WEB_BASE = process.env.SQLM_WEB || 'https://sqlmaster.app';
 export const WEB_PAGES: Record<string, string> = { forgot: '/sifremi-unuttum', register: '/kayit', account: '/hesabim' };
+export const MASTERTOOL_URL = 'https://mastertool.download/';
 
 const SYNC_DEBOUNCE_MS = 3000;
 const SYNC_INTERVAL_MS = 5 * 60 * 1000;

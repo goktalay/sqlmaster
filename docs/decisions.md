@@ -69,8 +69,7 @@ yüzden akıştaki `done` olayıyla belirlenir (`renderer/conn/runner.ts`).
 SSH Master v1.2 / FTP Masters v1.1 ile aynı model (`src/main/account/`): prelogin/login (PBKDF2 → authHash),
 "Beni hatırla" (belirteç ve şifreleme anahtarı DPAPI ile), çevrimdışı açılış, uçtan uca şifreli kütüphane senkronu
 (AES-256-GCM, HKDF info `sqlm-enc-v1`), yeni sürüm bildirimi, `app_version = app.getVersion()`. Arayüz yalnızca
-`IAccountService`'i tanır. Uçlar varsayılan `/api/sq/*` — sözleşme HEPGO sunucu oturumundan gelince
-kesinleşecek (bkz. `account-contract.md`). Paketlenmemiş sürümde `SQLM_DEV_ACCOUNT=1` ile yerel geliştirme
+`IAccountService`'i tanır. Uçlar `/api/sq/*` — sözleşme v1 HEPGO sunucu oturumundan doğrulandı (bkz. `account-contract.md`). Paketlenmemiş sürümde `SQLM_DEV_ACCOUNT=1` ile yerel geliştirme
 hesabı kullanılabilir; paketlenmiş exe'de bu yol kapalıdır.
 
 ## ADR-007 — Kurulum

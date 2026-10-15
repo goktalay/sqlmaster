@@ -30,7 +30,7 @@ export interface Api {
   syncNow(): Promise<void>;
   setSyncEnabled(on: boolean): Promise<{ ok: boolean; code?: string }>;
   deleteRemoteLibrary(): Promise<{ ok: boolean; code?: string }>;
-  openWeb(page: 'forgot' | 'register' | 'account'): Promise<void>;
+  openWeb(page: 'forgot' | 'register' | 'account' | 'mastertool'): Promise<void>;
   onAccountStatus(cb: (st: AccountState) => void): Unsub;
   onUpdateAvailable(cb: (info: { version: string; notes: string }) => void): Unsub;
   onLibraryBackup(cb: (file: string) => void): Unsub;
