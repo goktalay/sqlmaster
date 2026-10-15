@@ -44,6 +44,7 @@ export const de: Record<string, string> = {
   'auth.errUnverified': 'Ihre E-Mail-Adresse ist noch nicht bestätigt. Klicken Sie auf den Link in Ihrem Posteingang.', 'auth.errSuspended': 'Ihr Konto ist gesperrt.',
   'auth.errRateLimited': 'Zu viele Versuche. Versuchen Sie es in einer Minute erneut.', 'auth.errOffline': 'Server nicht erreichbar. Prüfen Sie Ihre Internetverbindung.',
   'auth.errSessionExpired': 'Ihre Sitzung ist abgelaufen oder Ihr Passwort wurde geändert. Bitte melden Sie sich erneut an.',
+  'auth.signedOutElsewhere': 'Sie haben sich in einer anderen Mastertool-App abgemeldet. Ihre lokalen Verbindungen bleiben auf diesem Computer.',
   'auth.errAppDisabled': 'SQL Master ist für Ihr Konto deaktiviert. Support: mastertool.download > Mein Konto > Support.',
   'auth.errWrongApp': 'Diese Sitzung gehört zu einer anderen Anwendung. Bitte melden Sie sich erneut bei SQL Master an.', 'auth.errServer': 'Anmeldung nicht möglich: {msg}',
   'auth.devNotice': 'Entwicklungsmodus: Statt des Mastertool-Servers wird ein lokales Konto verwendet (beliebige E-Mail/beliebiges Passwort, keine Synchronisierung).',

@@ -92,6 +92,9 @@ Farklı biçimler tek sorguda birleştirilebilir, örneğin CSV ile JSON'u JOIN 
   - Veri istemcide AES-256-GCM ile şifrelenir. Anahtar hesap şifresinden türetilir (PBKDF2-SHA256, ardından HKDF-SHA256) ve sunucuya gitmez.
   - Sunucu yalnızca şifreli bloğu görür. Girişte şifrenin kendisi değil, ondan türetilmiş bir doğrulama değeri gönderilir.
   - Cihaza özgü alanlar (yerel anahtar dosyası yolu gibi) senkronlanmaz. Senkron ayarlardan kapatılabilir.
+- **Ortak oturum (Windows):** bir Mastertool uygulamasında giriş yapılınca diğerleri şifresiz açılır, birinde çıkış yapılınca hepsi kapanır.
+  - Ortak kimlik Windows Kimlik Bilgisi Yöneticisi'nde (DPAPI) tutulur; şifre saklanmaz.
+  - Çıkışta yerel bağlantılar silinmez.
 - **Salt okunur kip:** yeni bağlantılarda varsayılan olarak açıktır ve iki katmanda uygulanır.
   1. *İfade sınıflandırıcı:* çalıştırılmadan önce her ifade okuma, oturum ya da yazma olarak sınıflandırılır.
      - INSERT/UPDATE/DELETE/MERGE, DDL ve etkisi bilinmeyen komutlar (EXEC, CALL…) yazma sayılır.

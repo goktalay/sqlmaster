@@ -1,12 +1,15 @@
 // Mastertool hesabı + uçtan uca şifreli kütüphane senkronu (SSH Master v1.2 / FTP Masters v1.1 ile aynı model).
 // Uçlar /api/sq/* — Mastertool sözleşmesi v1 (docs/account-contract.md).
+// Cihazda ortak oturum (sso.ts): şifreyle girişte ortak kimlik yazılır; diğer Mastertool uygulamalarındaki
+// giriş /auth/sso ile şifresiz oturuma, çıkış ise bu uygulamada da çıkışa dönüşür. Yerel veriler silinmez.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import type { AccountState } from '../../shared/types';
-import { AccountError, compareVersions, type AccountEvents, type IAccountService } from './types';
-import { decryptLibrary, deriveKeys, encryptLibrary, hashOf, type Kdf } from './crypto';
+import { AccountError, compareVersions, type AccountEvents, type IAccountService, type SsoResult } from './types';
+import { decryptLibrary, deriveKeys, encKeyFromMaster, encryptLibrary, hashOf, type Kdf } from './crypto';
+import type { SsoCredential, SsoStore, SsoWatcher } from './sso';
 import { itemsFromMeta, itemsKey, merge, refreshMeta, SETTINGS_ID, type SyncItem } from './sync';
 import type { LibraryAdapter } from './library';
 
@@ -28,6 +31,8 @@ export interface MastertoolDeps extends AccountEvents {
   protect(text: string): string;
   unprotect(text: string): string;
   library: LibraryAdapter;
+  /** Cihazda ortak oturum; yoksa (Windows dışı, geliştirme) devre dışı */
+  sso?: SsoStore | null;
   fetch?: typeof fetch;
   log?: (msg: string, data?: unknown) => void;
 }
@@ -48,6 +53,8 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
     deviceId: string; email: string; remember: boolean; lastUserId: string | null;
     token?: string; encKey?: string; user?: Session['user']; kdfSalt?: string; syncEnabled?: boolean;
     lastSyncAt?: number | null; libraryVersion?: number | null;
+    /** Bu oturumun bağlı olduğu ortak kimliğin özeti (sso_token'ın kendisi saklanmaz) */
+    ssoTag?: string;
   }
   let saved: Saved = { deviceId: crypto.randomUUID(), email: '', remember: true, lastUserId: null };
   try { saved = { ...saved, ...JSON.parse(fs.readFileSync(file, 'utf8')) }; } catch { /* ilk açılış */ }
@@ -133,6 +140,100 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
 
   const deviceName = () => `${os.hostname()} (${process.platform === 'win32' ? 'Windows' : process.platform})`.slice(0, 120);
 
+  // --- Ortak oturum (SSO) ------------------------------------------------------------
+  const sso = deps.sso ?? null;
+  let watcher: SsoWatcher | null = null;
+  const ssoTag = (token: string) => crypto.createHash('sha256').update(token).digest('hex').slice(0, 32);
+
+  /** Ortak kimliği yazar ve diğer uygulamalara "giriş" işareti verir */
+  function publishShared(d: { email: string; user: Session['user']; sso_token: string; master: Buffer; kdf: Kdf }) {
+    if (!sso) return;
+    try {
+      sso.writeCredential({ email: d.email, user: { id: d.user.id, name: d.user.name }, sso_token: d.sso_token, master: d.master, kdf: d.kdf });
+      const st = sso.bumpState('in'); // ?. ile yazılmaz: izleyici yoksa da işaret verilmeli
+      watcher?.seen(st.gen);
+      saved.ssoTag = ssoTag(d.sso_token);
+    } catch (e) {
+      deps.log?.('Ortak oturum yazılamadı', { message: (e as Error).message });
+    }
+  }
+
+  /** Ortak kimliği siler ve diğer uygulamalara "çıkış" işareti verir */
+  function clearShared() {
+    delete saved.ssoTag;
+    if (!sso) return;
+    try {
+      sso.deleteCredential();
+      const st = sso.bumpState('out');
+      watcher?.seen(st.gen);
+    } catch (e) {
+      deps.log?.('Ortak oturum silinemedi', { message: (e as Error).message });
+    }
+  }
+
+  /** Yerel oturumu kapatır (sunucuya gitmez); kütüphane ve ayarlar yerinde kalır */
+  function dropLocal() {
+    session = null;
+    stopTimers();
+    persist();
+  }
+
+  /** Ortak kimlikle şifresiz giriş: POST /auth/sso → uygulama token'ı; şifreleme anahtarı master'dan türetilir */
+  async function loginWithSso(cred: SsoCredential): Promise<SsoResult> {
+    let res: { token: string; user: Session['user']; kdf?: Kdf; sync_enabled?: boolean };
+    try {
+      res = await api('POST', '/auth/sso', { body: { sso_token: cred.sso_token, device: deviceName(), app_version: String(deps.appVersion).slice(0, 30) } });
+    } catch (e) {
+      const err = e as AccountError;
+      // Ortak oturum sunucuda bitmiş: kimliği temizle, herkes giriş ekranına dönsün
+      if (err.status === 401) clearShared();
+      return { ok: false, code: err.code };
+    }
+    const master = Buffer.from(cred.master || '', 'base64');
+    if (master.length !== 32) return { ok: false, code: 'bad_credential' };
+    const kdfSalt = res.kdf?.salt ?? cred.kdf?.salt ?? '';
+    // Şifre değişmişse eski master yanlış anahtar üretir; bu durumda şifreyle giriş gerekir
+    if (res.kdf && cred.kdf && res.kdf.salt !== cred.kdf.salt) return { ok: false, code: 'session_expired' };
+    const encKey = encKeyFromMaster(master);
+    master.fill(0);
+    let backupFile: string | null = null;
+    if (saved.lastUserId && saved.lastUserId !== res.user.id) backupFile = deps.library.backupAndClear();
+    session = { token: res.token, user: res.user, encKey, kdfSalt, syncEnabled: res.sync_enabled !== false };
+    saved.email = String(res.user.email || cred.email || '').toLowerCase();
+    saved.remember = true;
+    saved.lastUserId = res.user.id;
+    saved.ssoTag = ssoTag(cred.sso_token);
+    if (backupFile) { status.libraryVersion = null; status.lastSyncAt = null; }
+    persist();
+    setStatus({ error: null });
+    return { ok: true, backupFile };
+  }
+
+  // Başka uygulamada giriş/çıkış: asıl bilgi ortak kimlikten okunur, durum dosyası yalnızca işarettir
+  let reacting: Promise<void> | null = null;
+  function onSharedChange(): Promise<void> {
+    if (reacting) return reacting;
+    reacting = (async () => {
+      const cred = sso?.readCredential() ?? null;
+      if (!cred) {
+        if (session) { dropLocal(); setStatus({ state: 'idle', error: null }); deps.onSessionExpired('signed_out'); }
+        return;
+      }
+      if (session && saved.ssoTag === ssoTag(cred.sso_token)) return;
+      if (session && cred.user?.id != null && String(cred.user.id) === String(session.user.id)) {
+        // Aynı hesap başka uygulamada yeniden giriş yaptı: bizim token'ımız geçerli, yalnız bağı güncelle
+        saved.ssoTag = ssoTag(cred.sso_token);
+        persist();
+        return;
+      }
+      if (session) { dropLocal(); deps.onSessionExpired('signed_out'); } // başka hesaba geçildi
+      const r = await loginWithSso(cred);
+      if (r.ok) deps.onSignedIn?.(r.backupFile ?? null);
+      else if (r.code === 'app_disabled') deps.onSessionExpired('app_disabled');
+    })().finally(() => { reacting = null; });
+    return reacting;
+  }
+
   let debounce: NodeJS.Timeout | null = null;
   let interval: NodeJS.Timeout | null = null;
   const stopTimers = () => {
@@ -142,6 +243,9 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
   };
 
   function expire(code = 'session_expired') {
+    // Oturum sunucuda bitti: ortak kimlik de geçersizdir, diğer uygulamalar da çıkış yapar.
+    // Lisans/uygulama hataları (app_disabled, wrong_app) yalnız bu uygulamayı ilgilendirir.
+    if (code === 'session_expired') clearShared();
     session = null;
     stopTimers();
     persist();
@@ -257,12 +361,21 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
     async login(email, password, remember) {
       email = String(email || '').trim().toLowerCase();
       const pre = await api<{ kdf: Kdf }>('POST', '/auth/prelogin', { body: { email } });
-      const { authHash, encKey } = await deriveKeys(password, pre.kdf);
-      const res = await api<{ token: string; user: Session['user']; kdf?: Kdf; sync_enabled?: boolean }>('POST', '/auth/login', {
-        body: { email, auth_hash: authHash, device: deviceName(), app_version: String(deps.appVersion).slice(0, 30) },
-      });
-      let key = encKey;
-      if (res.kdf && res.kdf.salt !== pre.kdf.salt) key = (await deriveKeys(password, res.kdf)).encKey;
+      let keys = await deriveKeys(password, pre.kdf);
+      let res: { token: string; sso_token?: string; user: Session['user']; kdf?: Kdf; sync_enabled?: boolean };
+      try {
+        res = await api('POST', '/auth/login', {
+          body: { email, auth_hash: keys.authHash, device: deviceName(), app_version: String(deps.appVersion).slice(0, 30), ...(sso ? { sso: true } : {}) },
+        });
+      } catch (e) {
+        keys.master.fill(0);
+        throw e;
+      }
+      if (res.kdf && res.kdf.salt !== pre.kdf.salt) {
+        keys.master.fill(0);
+        keys = await deriveKeys(password, res.kdf);
+      }
+      const key = keys.encKey;
       // Farklı hesapla giriş: bu bilgisayardaki kütüphane başka hesaba ait olabilir; birleştirme yerine yedekle
       let backupFile: string | null = null;
       if (saved.lastUserId && saved.lastUserId !== res.user.id) backupFile = deps.library.backupAndClear();
@@ -270,18 +383,34 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
       saved.email = email;
       saved.remember = !!remember;
       saved.lastUserId = res.user.id;
+      if (res.sso_token) publishShared({ email, user: res.user, sso_token: res.sso_token, master: keys.master, kdf: res.kdf ?? pre.kdf });
+      keys.master.fill(0);
       if (backupFile) { status.libraryVersion = null; status.lastSyncAt = null; }
       persist();
       setStatus({ error: null });
       return { backupFile };
     },
     async logout() {
+      // Sıra (sözleşme): logout ucu → ortak kimliği sil → kendi token'ını sil → durum "out"
       const token = session?.token;
-      session = null;
-      stopTimers();
-      persist();
+      if (token) await api('POST', '/auth/logout', { token, timeout: 5000 }).catch(() => {});
+      clearShared();
+      dropLocal();
       setStatus({ state: 'idle', error: null });
-      if (token) api('POST', '/auth/logout', { token }).catch(() => {});
+    },
+    async trySso() {
+      if (session) return { ok: true };
+      const cred = sso?.readCredential() ?? null;
+      if (!cred) return { ok: false };
+      return loginWithSso(cred);
+    },
+    startWatching() {
+      if (!sso || watcher) return;
+      watcher = sso.watch(() => void onSharedChange());
+    },
+    stopWatching() {
+      watcher?.stop();
+      watcher = null;
     },
     async start() {
       if (!session) return;

@@ -8,6 +8,7 @@ import type { ConnectionForm, ConnectionProfile, Settings } from '../shared/type
 import type { ConnectionConfig, NodePath, TreeNode } from '../core/provider';
 import type { ExecuteRequest } from '../core/engine/executor';
 import type { ExportFormat } from '../core/engine/export';
+import { createSso, systemKeyring } from './account/sso';
 import { createServices, type Services } from './container';
 import { secretRef } from './store';
 import { DbHost } from './dbhost-client';
@@ -128,8 +129,23 @@ function applyOpenAtLogin() {
   app.setLoginItemSettings({ openAtLogin: !!svc.store.data.settings.openAtLogin, args: ['--hidden'] });
 }
 
+// Girişten sonra (şifreyle ya da başka uygulamadaki ortak oturumla) ana pencereye geç
+function openMainAfterLogin(backupFile: string | null | undefined) {
+  loginNotice = null;
+  if (!mainWindow) createMainWindow();
+  loginWindow?.destroy();
+  if (backupFile) mainWindow!.webContents.once('did-finish-load', () => mainWindow?.webContents.send('account:backup', backupFile));
+  void svc.account.start();
+}
+
+// İkinci örnek açılınca (ör. Master Tool tepsi menüsünden) gizli/simge durumundaki pencere öne gelir
 function showMainWindow() {
-  if (!svc.account.isLoggedIn()) return loginWindow ? loginWindow.focus() : showLogin();
+  if (!svc.account.isLoggedIn()) {
+    if (!loginWindow) return showLogin();
+    if (loginWindow.isMinimized()) loginWindow.restore();
+    loginWindow.show();
+    return loginWindow.focus();
+  }
   if (!mainWindow) createMainWindow();
   if (mainWindow!.isMinimized()) mainWindow!.restore();
   mainWindow!.show();
@@ -287,10 +303,7 @@ function registerIpc() {
       const { backupFile } = await svc.account.login(email, password, remember);
       loginNotice = null;
       svc.log.info('Giriş yapıldı');
-      if (!mainWindow) createMainWindow();
-      loginWindow?.destroy();
-      if (backupFile) mainWindow!.webContents.once('did-finish-load', () => mainWindow?.webContents.send('account:backup', backupFile));
-      void svc.account.start();
+      openMainAfterLogin(backupFile);
       return { ok: true };
     } catch (err) {
       const e = err as { code?: string; message?: string };
@@ -473,7 +486,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => showMainWindow());
-  void app.whenReady().then(() => {
+  void app.whenReady().then(async () => {
     const devAccount = !app.isPackaged && process.env.SQLM_DEV_ACCOUNT === '1';
     svc = createServices({
       userDataDir: app.getPath('userData'),
@@ -486,9 +499,14 @@ if (!app.requestSingleInstanceLock()) {
       devAccount,
       accountEvents: {
         onStatus: (st) => broadcast('account:status', st),
-        onSessionExpired: (code) => showLogin(t(code === 'app_disabled' ? 'auth.errAppDisabled' : code === 'wrong_app' ? 'auth.errWrongApp' : 'auth.errSessionExpired')),
+        onSessionExpired: (code) => showLogin(t(code === 'app_disabled' ? 'auth.errAppDisabled' : code === 'wrong_app' ? 'auth.errWrongApp' : code === 'signed_out' ? 'auth.signedOutElsewhere' : 'auth.errSessionExpired')),
+        onSignedIn: (backupFile) => openMainAfterLogin(backupFile),
         onUpdate: (info) => mainWindow?.webContents.send('app:update', info),
       },
+      sso: devAccount || process.platform !== 'win32' ? null : (() => {
+        const keyring = systemKeyring();
+        return keyring ? createSso({ keyring, stateDir: path.join(app.getPath('appData'), 'Mastertool') }) : null;
+      })(),
       onLibraryApplied: () => {
         const prev = currentLang();
         applyAppTheme();
@@ -504,14 +522,19 @@ if (!app.requestSingleInstanceLock()) {
     // "Beni hatırla" ile saklı oturum varsa doğrudan açılır (çevrimdışıyken yerel kütüphaneyle)
     applyOpenAtLogin();
     updateTray();
+    // Kendi oturumu yoksa başka bir Mastertool uygulamasındaki girişle şifresiz açılmayı dene
+    const sso = svc.account.isLoggedIn() ? { ok: true } : await svc.account.trySso();
+    if (sso.code === 'app_disabled') loginNotice = t('auth.errAppDisabled');
     if (svc.account.isLoggedIn()) {
       // Windows açılışında (--hidden) ve tepsi açıksa pencere gizli başlar
       const hidden = process.argv.includes('--hidden') && (svc.store.data.settings.minimizeToTray || svc.store.data.settings.closeToTray);
       createMainWindow({ hidden });
+      if (sso.backupFile) mainWindow!.webContents.once('did-finish-load', () => mainWindow?.webContents.send('account:backup', sso.backupFile));
       void svc.account.start();
     } else {
       createLoginWindow();
     }
+    svc.account.startWatching();
     app.on('activate', () => BrowserWindow.getAllWindows().length === 0 && showMainWindow());
   });
 

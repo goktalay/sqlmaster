@@ -44,6 +44,7 @@ export const zh: Record<string, string> = {
   'auth.errUnverified': '你的电子邮件尚未验证。请点击收件箱中的链接。', 'auth.errSuspended': '你的账户已被停用。',
   'auth.errRateLimited': '尝试次数过多。请一分钟后再试。', 'auth.errOffline': '无法连接服务器。请检查网络连接。',
   'auth.errSessionExpired': '会话已过期或密码已更改。请重新登录。',
+  'auth.signedOutElsewhere': '你已在另一个 Mastertool 应用中退出登录。本地连接仍保留在这台电脑上。',
   'auth.errAppDisabled': '此账户已停用 SQL Master。获取支持：mastertool.download > 我的账户 > 支持。',
   'auth.errWrongApp': '此会话属于其他应用。请重新登录 SQL Master。', 'auth.errServer': '无法登录：{msg}',
   'auth.devNotice': '开发模式：使用本地账户代替 Mastertool 服务器（任意电子邮件/密码，不同步）。',

@@ -44,6 +44,7 @@ export const es: Record<string, string> = {
   'auth.errUnverified': 'Tu correo aún no está verificado. Haz clic en el enlace de tu bandeja de entrada.', 'auth.errSuspended': 'Tu cuenta está suspendida.',
   'auth.errRateLimited': 'Demasiados intentos. Vuelve a intentarlo en un minuto.', 'auth.errOffline': 'No se puede acceder al servidor. Comprueba tu conexión a Internet.',
   'auth.errSessionExpired': 'Tu sesión caducó o tu contraseña cambió. Vuelve a iniciar sesión.',
+  'auth.signedOutElsewhere': 'Cerraste sesión en otra aplicación de Mastertool. Tus conexiones locales siguen en este equipo.',
   'auth.errAppDisabled': 'SQL Master está desactivado para tu cuenta. Soporte: mastertool.download > Mi cuenta > Soporte.',
   'auth.errWrongApp': 'Esta sesión pertenece a otra aplicación. Vuelve a iniciar sesión en SQL Master.', 'auth.errServer': 'No se pudo iniciar sesión: {msg}',
   'auth.devNotice': 'Modo de desarrollo: se usa una cuenta local en lugar del servidor de Mastertool (cualquier correo/contraseña, sin sincronización).',

@@ -9,6 +9,7 @@ import { History } from './history';
 import type { AccountEvents, IAccountService } from './account/types';
 import { createMastertoolAccount } from './account/mastertool';
 import { createDevAccount } from './account/dev';
+import type { SsoStore } from './account/sso';
 import { createLibraryAdapter } from './account/library';
 
 export interface Services {
@@ -26,6 +27,8 @@ export interface ServiceOptions {
   devAccount: boolean;
   accountEvents: AccountEvents;
   onLibraryApplied: () => void;
+  /** Cihazda ortak oturum (Mastertool uygulamaları arasında); yoksa devre dışı */
+  sso?: SsoStore | null;
 }
 
 export function createServices(o: ServiceOptions): Services {
@@ -47,6 +50,7 @@ export function createServices(o: ServiceOptions): Services {
         protect,
         unprotect,
         library: createLibraryAdapter(store, secrets, o.userDataDir, o.onLibraryApplied),
+        sso: o.sso ?? null,
         log: (m, d) => log.warn(m, d),
       });
   store.onLibraryChange = () => account.onLocalChange();

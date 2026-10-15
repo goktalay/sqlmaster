@@ -17,14 +17,18 @@ export const ENC_INFO = 'sqlm-enc-v1';
 const pbkdf2 = (pass: Buffer, salt: Buffer, iter: number, len: number) =>
   new Promise<Buffer>((resolve, reject) => crypto.pbkdf2(pass, salt, iter, len, 'sha256', (e, k) => (e ? reject(e) : resolve(k))));
 
-export async function deriveKeys(password: string, kdf: Kdf): Promise<{ authHash: string; encKey: Buffer }> {
+/** master yalnızca ortak oturum kimliğine (sso.ts) yazılmak için döner; çağıran iş bitince sıfırlar */
+export async function deriveKeys(password: string, kdf: Kdf): Promise<{ authHash: string; encKey: Buffer; master: Buffer }> {
   if (!kdf || kdf.alg !== 'PBKDF2-SHA256') throw new AccountError(0, 'unsupported_kdf');
   const pw = Buffer.from(password, 'utf8');
   const master = await pbkdf2(pw, Buffer.from(kdf.salt, 'base64'), kdf.iter, 32);
   const authHash = (await pbkdf2(master, pw, 1, 32)).toString('base64');
-  const encKey = Buffer.from(crypto.hkdfSync('sha256', master, Buffer.alloc(0), Buffer.from(ENC_INFO), 32));
-  master.fill(0);
-  return { authHash, encKey };
+  return { authHash, encKey: encKeyFromMaster(master), master };
+}
+
+/** Şifresiz (ortak oturumla) girişte şifreleme anahtarı, ortak kimlikteki master'dan türetilir */
+export function encKeyFromMaster(master: Buffer): Buffer {
+  return Buffer.from(crypto.hkdfSync('sha256', master, Buffer.alloc(0), Buffer.from(ENC_INFO), 32));
 }
 
 export function encryptLibrary(key: Buffer, obj: unknown): string {
