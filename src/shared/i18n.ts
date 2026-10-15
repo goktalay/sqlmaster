@@ -33,7 +33,8 @@ export function resolveLanguage(code: string | null | undefined): string {
 export function createT(lang: string): T {
   const dict = STRINGS[lang] || STRINGS.en;
   return (key, vars) => {
-    let s = dict[key] ?? STRINGS.en[key] ?? key;
+    // Tekil biçim: dilde "<anahtar>_one" varsa ve n = 1 ise o kullanılır (ör. en: "1 connection")
+    let s = (vars?.n === 1 ? dict[`${key}_one`] : undefined) ?? dict[key] ?? STRINGS.en[key] ?? key;
     if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined ? String(vars[k]) : m));
     return s;
   };

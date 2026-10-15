@@ -1,0 +1,74 @@
+[
+  {
+    "file": "01-ana-ekran-gece.png",
+    "theme": "dark",
+    "title": "Connection cards",
+    "caption": "All your databases as cards; drag them into folders to organize"
+  },
+  {
+    "file": "02-ana-ekran-gunduz.png",
+    "theme": "light",
+    "title": "Connection cards (light)",
+    "caption": "Dark, light or system theme — one click away"
+  },
+  {
+    "file": "03-baglanti-formu-gece.png",
+    "theme": "dark",
+    "title": "Connection form",
+    "caption": "Test the connection: server version, TLS status and user at a glance"
+  },
+  {
+    "file": "04-tablo-verisi-gece.png",
+    "theme": "dark",
+    "title": "Schema explorer and table data",
+    "caption": "Hide, sort and filter columns — the SQL behind the grid updates live"
+  },
+  {
+    "file": "05-tablo-verisi-gunduz.png",
+    "theme": "light",
+    "title": "Schema explorer and table data (light)",
+    "caption": "Tables, views, functions, triggers: loaded on demand"
+  },
+  {
+    "file": "06-sql-editor-gece.png",
+    "theme": "dark",
+    "title": "SQL editor",
+    "caption": "Run with Ctrl+Enter; multiple result sets, autocomplete, cancel"
+  },
+  {
+    "file": "07-sql-editor-gunduz.png",
+    "theme": "light",
+    "title": "SQL editor (light)",
+    "caption": "Syntax highlighting with table and column completion"
+  },
+  {
+    "file": "08-sorgu-olusturucu-gece.png",
+    "theme": "dark",
+    "title": "Visual query builder",
+    "caption": "Drag tables in, draw joins; SQL is generated live and runs"
+  },
+  {
+    "file": "09-ddl-goruntuleyici-gece.png",
+    "theme": "dark",
+    "title": "Code and DDL viewer",
+    "caption": "Functions, procedures, triggers and view definitions, highlighted"
+  },
+  {
+    "file": "10-duckdb-dosyalar-gece.png",
+    "theme": "dark",
+    "title": "CSV, Parquet, JSON and Excel",
+    "caption": "Query files directly with SQL via DuckDB — no import step"
+  },
+  {
+    "file": "11-ayarlar-gece.png",
+    "theme": "dark",
+    "title": "Settings",
+    "caption": "8 languages, theme, startup, Mastertool account and encrypted sync"
+  },
+  {
+    "file": "12-salt-okunur-gece.png",
+    "theme": "dark",
+    "title": "Read-only mode",
+    "caption": "Statements that change data ask for your confirmation first"
+  }
+]

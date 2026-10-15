@@ -9,7 +9,7 @@ export const en: Record<string, string> = {
   'app.stats': '{c} connections · {f} folders', 'app.welcome': 'Welcome', 'app.results': 'Results for “{q}”', 'app.all': 'All connections',
   'app.welcomeHint': 'Connect to PostgreSQL, SQL Server, MySQL, SQLite or CSV/Parquet/Excel files.<br>Enter the details, test the connection and save.',
   'app.folders': 'Folders', 'app.connections': 'Connections', 'app.dblHint': 'Double-click a card to open', 'app.noMatch': 'No matching connections.',
-  'app.folderCount': '{n} connections', 'app.newConnHere': 'New connection in this folder', 'app.newSubfolder': 'New subfolder', 'app.duplicate': 'Duplicate',
+  'app.folderCount': '{n} connections', 'app.folderCount_one': '{n} connection', 'app.newConnHere': 'New connection in this folder', 'app.newSubfolder': 'New subfolder', 'app.duplicate': 'Duplicate',
   'app.moveToFolder': 'Move to folder…', 'app.connMoved': 'Connection moved', 'app.folderIntoSelf': 'A folder cannot be moved into itself', 'app.folderPh': 'e.g. Customers',
   'app.renameFolder': 'Rename folder', 'app.deleteFolder': 'Delete folder', 'app.deleteFolderMsg': 'Delete folder <b>{name}</b>?',
   'app.deleteFolderConns': '<br>Its {n} connections will move to the parent folder.', 'app.rootFolder': 'Top level (no folder)', 'app.moveTitle': 'Move “{name}”',
@@ -79,16 +79,16 @@ export const en: Record<string, string> = {
   'kind.procedure': 'Procedure', 'kind.trigger': 'Trigger', 'kind.sequence': 'Sequence', 'kind.type': 'Type', 'kind.index': 'Index', 'kind.constraint': 'Constraint',
 
   'sql.run': 'Run', 'sql.runStatement': 'Run statement', 'sql.cancel': 'Cancel', 'sql.database': 'Database', 'sql.history': 'History',
-  'sql.export': 'Export', 'sql.running': 'Running…', 'sql.done': 'Done · {ms} ms', 'sql.doneErrors': '{n} errors · {ms} ms',
+  'sql.export': 'Export', 'sql.running': 'Running…', 'sql.done': 'Done · {ms} ms', 'sql.doneErrors': '{n} errors · {ms} ms', 'sql.doneErrors_one': '{n} error · {ms} ms',
   'sql.ddlHint': 'Schema changed: use Refresh to reload the tree.', 'sql.placeholder': 'Type SQL… Ctrl+Enter: run selection/all · Ctrl+Shift+Enter: statement at cursor · Ctrl+Space: complete',
   'sql.tabTitle': 'SQL {n}', 'sql.historyEmpty': 'No history for this connection.', 'sql.rowsShort': 'rows',
 
-  'res.result': 'Result {n}', 'res.messages': 'Messages', 'res.rows': '{n} rows · {ms} ms', 'res.rowsTruncated': 'Showing the first {n} rows (limit) · {ms} ms',
-  'res.noRows': 'No rows', 'res.affected': '{cmd}: {n} rows affected · {ms} ms', 'res.command': '{cmd} · {ms} ms', 'res.cancelled': 'Cancelled',
+  'res.result': 'Result {n}', 'res.messages': 'Messages', 'res.rows': '{n} rows · {ms} ms', 'res.rows_one': '{n} row · {ms} ms', 'res.rowsTruncated': 'Showing the first {n} rows (limit) · {ms} ms',
+  'res.noRows': 'No rows', 'res.affected': '{cmd}: {n} rows affected · {ms} ms', 'res.affected_one': '{cmd}: {n} row affected · {ms} ms', 'res.command': '{cmd} · {ms} ms', 'res.cancelled': 'Cancelled',
   'grid.copy': 'Copy', 'grid.copyHeaders': 'Copy with headers', 'grid.export': 'Export this result…',
 
   'data.columns': 'Columns', 'data.columnsHidden': 'Columns ({n}/{total})', 'data.addFilter': 'Filter', 'data.limit': 'Row count', 'data.firstN': 'First {n}',
-  'data.all': 'All (limited)', 'data.openInEditor': 'Open in SQL editor', 'data.clearFilters': 'Clear filters', 'data.rows': '{n} rows · {ms} ms',
+  'data.all': 'All (limited)', 'data.openInEditor': 'Open in SQL editor', 'data.clearFilters': 'Clear filters', 'data.rows': '{n} rows · {ms} ms', 'data.rows_one': '{n} row · {ms} ms',
   'data.rowsMore': 'First {n} rows · {ms} ms', 'data.error': 'Could not load data', 'data.sortAsc': 'Sort ascending', 'data.sortDesc': 'Sort descending',
   'data.sortClear': 'Clear sorting', 'data.filterColumn': 'Filter by this column…', 'data.hideColumn': 'Hide column', 'data.showAll': 'Show all columns',
   'data.filterEq': 'Equal to “{v}”', 'data.filterNe': 'Not equal to “{v}”', 'data.filterNull': 'NULL / not NULL', 'data.column': 'Column', 'data.operator': 'Condition',
@@ -108,10 +108,10 @@ export const en: Record<string, string> = {
   'ro.title': 'Read-only mode', 'ro.message': 'This connection is in read-only mode. The following statements may change data or schema:',
   'ro.hint': 'You can allow them for this run only; read-only mode comes back afterwards.', 'ro.runOnce': 'Run this once',
   'ro.notRun': 'Read-only mode: not executed',
-  'ro.blockedMsg': 'Read-only mode: {n} statements need approval.',
+  'ro.blockedMsg': 'Read-only mode: {n} statements need approval.', 'ro.blockedMsg_one': 'Read-only mode: {n} statement needs approval.',
 
   'exp.title': 'Export', 'exp.hint': 'The query runs again without a row limit and results are streamed straight to the file.',
-  'exp.running': 'Exporting…', 'exp.done': '{n} rows exported', 'exp.failed': 'Export failed',
+  'exp.running': 'Exporting…', 'exp.done': '{n} rows exported', 'exp.done_one': '{n} row exported', 'exp.failed': 'Export failed',
 
   'err.refused': 'Connection refused: the port is closed or the server is not running.', 'err.dns': 'Could not resolve the host name (DNS).',
   'err.timeout': 'Timed out: the server could not be reached.', 'err.reset': 'The server closed the connection.', 'err.unreach': 'The server is unreachable on the network.',
