@@ -1,0 +1,8 @@
+node_modules/
+dist/
+dist-app/
+*.log
+.DS_Store
+.env
+.sqlm-parts.*
+coverage/
