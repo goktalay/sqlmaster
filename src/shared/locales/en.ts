@@ -34,7 +34,7 @@ export const en: Record<string, string> = {
   'form.testFail': 'Could not connect', 'form.testDb': 'Database: {db} · User: {user}', 'form.noTls': 'Warning: the connection is unencrypted (server does not support TLS).',
   'form.saved': 'Connection saved', 'form.changesSaved': 'Changes saved',
 
-  'set.title': 'Settings', 'set.appearance': 'Appearance', 'set.theme': 'Theme', 'set.themeDark': 'Night', 'set.themeLight': 'Day', 'set.themeSystem': 'System',
+  'set.title': 'Settings', 'set.appearance': 'Appearance', 'set.theme': 'Theme', 'set.themeDark': 'Night', 'set.themeLight': 'Day', 'set.themeSystem': 'System preference',
   'set.language': 'Language', 'set.toLight': 'Switch to day theme', 'set.toDark': 'Switch to night theme', 'set.saved': 'Settings saved',
   'set.query': 'Queries', 'set.rowLimit': 'Maximum rows per result', 'set.previewRows': 'Rows shown when opening a table', 'set.fontSize': 'Editor font size (px)',
 
@@ -120,4 +120,32 @@ export const en: Record<string, string> = {
 
   'main.closeAnyway': 'Close anyway', 'main.closeRunning': 'Queries are still running. They will be cancelled if you close this window.', 'main.copySuffix': ' (copy)',
   'main.errConnNotFound': 'Connection not found', 'main.errNoSession': 'This window has no connection', 'main.errKeyFile': 'Could not read the SSH key file: {path}',
+
+  // Mastertool ortak ayarlar iskeleti (SSH Master ile aynı metinler)
+  'set.general': 'General',
+  'set.account': 'Account',
+  'set.about': 'About',
+  'set.startup': 'Startup',
+  'set.openAtLogin': 'Start when I sign in to Windows',
+  'set.openAtLoginHint': 'If minimizing to the tray is on, the app starts in the tray.',
+  'set.window': 'Window',
+  'set.minTray': 'Show in the system tray when minimized',
+  'set.minTrayHint': 'When minimized, the window leaves the taskbar and appears as the SQL Master icon in the tray next to the clock. Click the icon to restore it; right-click to connect quickly.',
+  'set.closeTray': 'Hide to tray when closed',
+  'set.closeTrayHint': 'The close (X) button hides the app to the tray instead of quitting. Use “Quit” in the tray menu to exit.',
+  'about.version': 'Version {version}',
+  'about.family': 'Part of the Mastertool family: SQL Master · FTP Masters · SQL Master · Notepad Master · Convert Master',
+  'about.checkUpdate': 'Check for updates',
+  'about.checking': 'Checking…',
+  'about.upToDate': 'SQL Master is up to date.',
+  'about.checkFailed': 'Could not check for updates: {msg}',
+  'about.licenses': 'Open-source licenses',
+  'about.licensesIntro': 'SQL Master uses the following open-source components:',
+  'about.chromium': 'Open Chromium licenses',
+  'main.trayShow': 'Show SQL Master',
+  'main.trayQuick': 'Quick connect',
+  'main.trayNone': 'No saved connections',
+  'main.trayQuit': 'Quit',
+  'set.languageHint': 'Open connection windows use the new language once reopened.',
+  'about.newVersion': 'New version available: {version}',
 };

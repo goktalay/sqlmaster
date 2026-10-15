@@ -66,6 +66,10 @@ export interface Settings {
   previewRows: number;
   editorFontSize: number;
   treeWidth: number;
+  /** Bu cihaza özgü (senkronlanmaz): Windows oturumu açılınca başlat, tepsi davranışı */
+  openAtLogin: boolean;
+  minimizeToTray: boolean;
+  closeToTray: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -76,6 +80,9 @@ export const DEFAULT_SETTINGS: Settings = {
   previewRows: 100,
   editorFontSize: 13,
   treeWidth: 300,
+  openAtLogin: false,
+  minimizeToTray: false,
+  closeToTray: false,
 };
 
 export interface PublicStore {

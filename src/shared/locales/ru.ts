@@ -34,7 +34,7 @@ export const ru: Record<string, string> = {
   'form.testFail': 'Не удалось подключиться', 'form.testDb': 'База данных: {db} · Пользователь: {user}', 'form.noTls': 'Внимание: подключение не зашифровано (сервер не поддерживает TLS).',
   'form.saved': 'Подключение сохранено', 'form.changesSaved': 'Изменения сохранены',
 
-  'set.title': 'Настройки', 'set.appearance': 'Внешний вид', 'set.theme': 'Тема', 'set.themeDark': 'Ночная', 'set.themeLight': 'Дневная', 'set.themeSystem': 'Системная',
+  'set.title': 'Настройки', 'set.appearance': 'Внешний вид', 'set.theme': 'Тема', 'set.themeDark': 'Ночная', 'set.themeLight': 'Дневная', 'set.themeSystem': 'Как в системе',
   'set.language': 'Язык', 'set.toLight': 'Включить дневную тему', 'set.toDark': 'Включить ночную тему', 'set.saved': 'Настройки сохранены',
   'set.query': 'Запросы', 'set.rowLimit': 'Максимум строк в результате', 'set.previewRows': 'Строк при открытии таблицы', 'set.fontSize': 'Размер шрифта редактора (px)',
 
@@ -120,4 +120,32 @@ export const ru: Record<string, string> = {
 
   'main.closeAnyway': 'Всё равно закрыть', 'main.closeRunning': 'Запросы ещё выполняются. Если закрыть это окно, они будут отменены.', 'main.copySuffix': ' (копия)',
   'main.errConnNotFound': 'Подключение не найдено', 'main.errNoSession': 'У этого окна нет подключения', 'main.errKeyFile': 'Не удалось прочитать файл ключа SSH: {path}',
+
+  // Mastertool ortak ayarlar iskeleti (SSH Master ile aynı metinler)
+  'set.general': 'Общие',
+  'set.account': 'Учётная запись',
+  'set.about': 'О программе',
+  'set.startup': 'Запуск',
+  'set.openAtLogin': 'Запускать при входе в Windows',
+  'set.openAtLoginHint': 'Если включено сворачивание в трей, приложение запускается в трее.',
+  'set.window': 'Окно',
+  'set.minTray': 'Сворачивать в системный трей',
+  'set.minTrayHint': 'При сворачивании окно исчезает с панели задач и появляется значком SQL Master в трее рядом с часами. Щёлкните значок, чтобы восстановить окно; правый щелчок — быстрое подключение.',
+  'set.closeTray': 'Скрывать в трей при закрытии',
+  'set.closeTrayHint': 'Кнопка закрытия (X) скрывает приложение в трей, а не завершает его. Для выхода используйте «Выход» в меню трея.',
+  'about.version': 'Версия {version}',
+  'about.family': 'Часть семейства Mastertool: SQL Master · FTP Masters · SQL Master · Notepad Master · Convert Master',
+  'about.checkUpdate': 'Проверить обновления',
+  'about.checking': 'Проверка…',
+  'about.upToDate': 'Установлена последняя версия SQL Master.',
+  'about.checkFailed': 'Не удалось проверить обновления: {msg}',
+  'about.licenses': 'Лицензии открытого ПО',
+  'about.licensesIntro': 'SQL Master использует следующие компоненты с открытым исходным кодом:',
+  'about.chromium': 'Открыть лицензии Chromium',
+  'main.trayShow': 'Показать SQL Master',
+  'main.trayQuick': 'Быстрое подключение',
+  'main.trayNone': 'Нет сохранённых подключений',
+  'main.trayQuit': 'Выход',
+  'set.languageHint': 'Открытые окна подключений будут использовать новый язык после повторного открытия.',
+  'about.newVersion': 'Доступна новая версия: {version}',
 };

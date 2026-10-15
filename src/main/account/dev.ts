@@ -25,5 +25,6 @@ export function createDevAccount(events: AccountEvents): IAccountService {
     async setSyncEnabled() { /* senkron yok */ },
     async deleteRemote() { /* senkron yok */ },
     async checkUpdate() { /* sürüm kontrolü yok */ },
+    async latestRelease() { return { version: null }; },
   };
 }

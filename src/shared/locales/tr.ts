@@ -35,7 +35,7 @@ export const tr: Record<string, string> = {
   'form.testFail': 'Bağlantı kurulamadı', 'form.testDb': 'Veritabanı: {db} · Kullanıcı: {user}', 'form.noTls': 'Uyarı: bağlantı şifresiz (sunucu TLS desteklemiyor).',
   'form.saved': 'Bağlantı kaydedildi', 'form.changesSaved': 'Değişiklikler kaydedildi',
 
-  'set.title': 'Ayarlar', 'set.appearance': 'Görünüm', 'set.theme': 'Tema', 'set.themeDark': 'Gece', 'set.themeLight': 'Gündüz', 'set.themeSystem': 'Sistem',
+  'set.title': 'Ayarlar', 'set.appearance': 'Görünüm', 'set.theme': 'Tema', 'set.themeDark': 'Gece', 'set.themeLight': 'Gündüz', 'set.themeSystem': 'Sistem tercihi',
   'set.language': 'Dil', 'set.toLight': 'Gündüz temasına geç', 'set.toDark': 'Gece temasına geç', 'set.saved': 'Ayarlar kaydedildi',
   'set.query': 'Sorgular', 'set.rowLimit': 'Sonuç başına en fazla satır', 'set.previewRows': 'Tablo açılınca gösterilen kayıt', 'set.fontSize': 'Editör yazı boyutu (px)',
 
@@ -120,4 +120,32 @@ export const tr: Record<string, string> = {
 
   'main.closeAnyway': 'Yine de kapat', 'main.closeRunning': 'Çalışan sorgular var. Pencere kapanırsa iptal edilecek.', 'main.copySuffix': ' (kopya)',
   'main.errConnNotFound': 'Bağlantı bulunamadı', 'main.errNoSession': 'Bu pencerenin bağlantısı yok', 'main.errKeyFile': 'SSH anahtar dosyası okunamadı: {path}',
+
+  // Mastertool ortak ayarlar iskeleti (SSH Master ile aynı metinler)
+  'set.general': 'Genel',
+  'set.account': 'Hesap',
+  'set.about': 'Hakkında',
+  'set.startup': 'Başlangıç',
+  'set.openAtLogin': 'Windows oturumu açılınca başlat',
+  'set.openAtLoginHint': 'Tepsiye küçültme açıksa uygulama tepside başlar.',
+  'set.window': 'Pencere',
+  'set.minTray': 'Küçültüldüğünde sistem tepsisinde göster',
+  'set.minTrayHint': 'Pencere küçültülünce görev çubuğundan gizlenir ve saatin yanındaki tepside SQL Master simgesi olarak görünür. Simgeye tıklayınca geri açılır; sağ tıkla hızlıca bağlanabilirsiniz.',
+  'set.closeTray': 'Kapatıldığında tepsiye gizle',
+  'set.closeTrayHint': 'Kapat (X) düğmesi uygulamadan çıkmak yerine onu tepsiye gizler. Çıkmak için tepsi menüsündeki “Çıkış”ı kullanın.',
+  'about.version': 'Sürüm {version}',
+  'about.family': 'Mastertool ailesinin bir parçasıdır: SQL Master · FTP Masters · SQL Master · Notepad Master · Convert Master',
+  'about.checkUpdate': 'Güncellemeleri denetle',
+  'about.checking': 'Denetleniyor…',
+  'about.upToDate': 'SQL Master güncel.',
+  'about.checkFailed': 'Güncelleme denetlenemedi: {msg}',
+  'about.licenses': 'Açık kaynak lisansları',
+  'about.licensesIntro': 'SQL Master şu açık kaynak bileşenleri kullanır:',
+  'about.chromium': 'Chromium lisanslarını aç',
+  'main.trayShow': 'SQL Master’ı göster',
+  'main.trayQuick': 'Hızlı bağlan',
+  'main.trayNone': 'Kayıtlı bağlantı yok',
+  'main.trayQuit': 'Çıkış',
+  'set.languageHint': 'Açık bağlantı pencereleri yeniden açıldığında yeni dili kullanır.',
+  'about.newVersion': 'Yeni sürüm hazır: {version}',
 };

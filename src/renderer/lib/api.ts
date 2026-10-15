@@ -23,6 +23,9 @@ export interface Api {
   showMain(): Promise<void>;
   clipboardWrite(text: string): Promise<void>;
   openFileDialog(opts: { provider?: string; save?: boolean; defaultPath?: string }): Promise<string | null>;
+  about(): Promise<{ version: string; electron: string; chrome: string; node: string }>;
+  checkUpdate(): Promise<{ ok: boolean; version?: string | null; newer?: boolean; message?: string }>;
+  openLicenses(): Promise<void>;
 
   accountState(): Promise<AccountState & { notice: string | null; appVersion: string }>;
   login(email: string, password: string, remember: boolean): Promise<{ ok: boolean; code?: string; message?: string }>;

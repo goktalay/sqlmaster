@@ -132,7 +132,8 @@ export function createBuilderTab(ctx: Ctx): Tab {
 
   /** Basit ilişki tahmini: yeni tabloda "<diğer>_id" kolonu varsa diğerinin "id" kolonuna bağla (ya da tersi) */
   function autoJoin(tb: QbTable) {
-    const singular = (s: string) => s.toLowerCase().replace(/(ies)$/, 'y').replace(/s$/, '');
+    // İngilizce (orders, categories) ve Türkçe (siparisler, urunlar) çoğul ekleri
+    const singular = (s: string) => s.toLowerCase().replace(/(ies)$/, 'y').replace(/(ler|lar)$/, '').replace(/s$/, '');
     for (const other of model.tables) {
       if (other === tb) continue;
       const tryPair = (a: QbTable, b: QbTable) => {

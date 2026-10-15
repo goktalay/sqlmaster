@@ -34,7 +34,7 @@ export const es: Record<string, string> = {
   'form.testFail': 'No se pudo conectar', 'form.testDb': 'Base de datos: {db} · Usuario: {user}', 'form.noTls': 'Aviso: la conexión no está cifrada (el servidor no admite TLS).',
   'form.saved': 'Conexión guardada', 'form.changesSaved': 'Cambios guardados',
 
-  'set.title': 'Ajustes', 'set.appearance': 'Apariencia', 'set.theme': 'Tema', 'set.themeDark': 'Noche', 'set.themeLight': 'Día', 'set.themeSystem': 'Sistema',
+  'set.title': 'Ajustes', 'set.appearance': 'Apariencia', 'set.theme': 'Tema', 'set.themeDark': 'Noche', 'set.themeLight': 'Día', 'set.themeSystem': 'Preferencia del sistema',
   'set.language': 'Idioma', 'set.toLight': 'Cambiar al tema de día', 'set.toDark': 'Cambiar al tema de noche', 'set.saved': 'Ajustes guardados',
   'set.query': 'Consultas', 'set.rowLimit': 'Máximo de filas por resultado', 'set.previewRows': 'Filas mostradas al abrir una tabla', 'set.fontSize': 'Tamaño de fuente del editor (px)',
 
@@ -120,4 +120,32 @@ export const es: Record<string, string> = {
 
   'main.closeAnyway': 'Cerrar de todos modos', 'main.closeRunning': 'Todavía hay consultas en ejecución. Se cancelarán si cierras esta ventana.', 'main.copySuffix': ' (copia)',
   'main.errConnNotFound': 'Conexión no encontrada', 'main.errNoSession': 'Esta ventana no tiene conexión', 'main.errKeyFile': 'No se pudo leer el archivo de clave SSH: {path}',
+
+  // Mastertool ortak ayarlar iskeleti (SSH Master ile aynı metinler)
+  'set.general': 'General',
+  'set.account': 'Cuenta',
+  'set.about': 'Acerca de',
+  'set.startup': 'Inicio',
+  'set.openAtLogin': 'Iniciar al iniciar sesión en Windows',
+  'set.openAtLoginHint': 'Si minimizar a la bandeja está activado, la aplicación se inicia en la bandeja.',
+  'set.window': 'Ventana',
+  'set.minTray': 'Mostrar en la bandeja del sistema al minimizar',
+  'set.minTrayHint': 'Al minimizar, la ventana sale de la barra de tareas y aparece como icono de SQL Master junto al reloj. Haz clic en el icono para restaurarla; clic derecho para conectar rápidamente.',
+  'set.closeTray': 'Ocultar en la bandeja al cerrar',
+  'set.closeTrayHint': 'El botón Cerrar (X) oculta la aplicación en la bandeja en lugar de salir. Usa «Salir» en el menú de la bandeja para cerrarla.',
+  'about.version': 'Versión {version}',
+  'about.family': 'Parte de la familia Mastertool: SQL Master · FTP Masters · SQL Master · Notepad Master · Convert Master',
+  'about.checkUpdate': 'Buscar actualizaciones',
+  'about.checking': 'Comprobando…',
+  'about.upToDate': 'SQL Master está actualizado.',
+  'about.checkFailed': 'No se pudieron buscar actualizaciones: {msg}',
+  'about.licenses': 'Licencias de código abierto',
+  'about.licensesIntro': 'SQL Master utiliza los siguientes componentes de código abierto:',
+  'about.chromium': 'Abrir licencias de Chromium',
+  'main.trayShow': 'Mostrar SQL Master',
+  'main.trayQuick': 'Conexión rápida',
+  'main.trayNone': 'No hay conexiones guardadas',
+  'main.trayQuit': 'Salir',
+  'set.languageHint': 'Las ventanas de conexión abiertas usarán el nuevo idioma al volver a abrirse.',
+  'about.newVersion': 'Nueva versión disponible: {version}',
 };
