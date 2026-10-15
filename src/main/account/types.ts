@@ -20,6 +20,8 @@ export interface IAccountService {
   setSyncEnabled(on: boolean): Promise<void>;
   deleteRemote(): Promise<void>;
   checkUpdate(): Promise<void>;
+  /** Ayarlar › Hakkında › Güncellemeleri denetle */
+  latestRelease(): Promise<{ version: string | null; notes?: string }>;
 }
 
 export interface AccountEvents {

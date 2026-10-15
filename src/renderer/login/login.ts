@@ -2,6 +2,7 @@
 import { LANGUAGES } from '../../shared/i18n';
 import { api } from '../lib/api';
 import { $, esc, h, icon, LANG, t } from '../lib/ui';
+import { mastertoolButton } from '../lib/mastertool';
 
 $('#subtitle').textContent = t('auth.subtitle');
 $('#lEmail').textContent = t('auth.email');
@@ -11,6 +12,7 @@ $('#forgot').textContent = t('auth.forgot');
 $('#noAccount').textContent = t('auth.noAccount');
 $('#register').textContent = t('auth.register');
 $('#submit').textContent = t('auth.submit');
+document.body.appendChild(Object.assign(mastertoolButton(), { id: 'mtk' }));
 $('#eye').innerHTML = icon('eye');
 $('#eye').title = t('common.show');
 

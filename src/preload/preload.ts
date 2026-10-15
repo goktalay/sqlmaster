@@ -15,6 +15,9 @@ const api = {
   showMain: inv('app:showMain'),
   clipboardWrite: inv('clipboard:write'),
   openFileDialog: inv('dialog:openFile'),
+  about: inv('app:about'),
+  checkUpdate: inv('app:checkUpdate'),
+  openLicenses: inv('app:openLicenses'),
 
   // hesap
   accountState: inv('account:state'),

@@ -315,5 +315,9 @@ export function createMastertoolAccount(deps: MastertoolDeps): IAccountService {
       persist();
     },
     checkUpdate,
+    async latestRelease() {
+      const r = await authed<{ version?: string | null; notes?: string }>('GET', '/releases/latest');
+      return { version: r?.version ?? null, notes: r?.notes };
+    },
   };
 }

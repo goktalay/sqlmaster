@@ -1,5 +1,5 @@
 // Ana süreç: pencereler, IPC, oturumlar. Uygulama Mastertool hesabıyla girişsiz açılmaz.
-import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeTheme, safeStorage, shell, type IpcMainInvokeEvent, type WebContents } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeImage, nativeTheme, safeStorage, shell, Tray, type IpcMainInvokeEvent, type WebContents } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createT, resolveLanguage, type T } from '../shared/i18n';
@@ -13,6 +13,7 @@ import { secretRef } from './store';
 import { DbHost } from './dbhost-client';
 import { MASTERTOOL_URL, WEB_BASE, WEB_PAGES } from './account/mastertool';
 import { friendlyError } from './errors';
+import { compareVersions } from './account/types';
 
 const ROOT = path.join(__dirname, '..');
 const ICON = path.join(ROOT, 'assets', 'icon.png');
@@ -71,14 +72,60 @@ function showLogin(notice?: string) {
   mainWindow = null;
 }
 
-function createMainWindow() {
+function createMainWindow({ hidden = false } = {}) {
   mainWindow = new BrowserWindow({
     width: 1180, height: 760, minWidth: 760, minHeight: 500, backgroundColor: windowBg(),
-    title: 'SQL Master', icon: ICON, autoHideMenuBar: true, webPreferences,
+    title: 'SQL Master', icon: ICON, autoHideMenuBar: true, webPreferences, show: !hidden,
   });
   mainWindow.setMenuBarVisibility(false);
   void mainWindow.loadFile(page('main'));
+  // Tepsi davranışı (Ayarlar › Genel › Başlangıç)
+  mainWindow.on('minimize', () => {
+    if (svc.store.data.settings.minimizeToTray) mainWindow?.hide();
+  });
+  mainWindow.on('close', (e) => {
+    if (!quitting && svc.store.data.settings.closeToTray) {
+      e.preventDefault();
+      mainWindow?.hide();
+    }
+  });
   mainWindow.on('closed', () => (mainWindow = null));
+}
+
+// ---------------------------------------------------------------------------
+// Sistem tepsisi ve Windows oturumu açılınca başlatma (Mastertool ortak iskeleti)
+// ---------------------------------------------------------------------------
+let tray: Tray | null = null;
+let quitting = false;
+
+function updateTray() {
+  const s = svc.store.data.settings;
+  const want = s.minimizeToTray || s.closeToTray;
+  if (!want) {
+    tray?.destroy();
+    tray = null;
+    return;
+  }
+  if (!tray) {
+    tray = new Tray(nativeImage.createFromPath(ICON).resize({ width: 16, height: 16 }));
+    tray.setToolTip('SQL Master');
+    tray.on('click', () => showMainWindow());
+  }
+  const conns = [...svc.store.data.connections].sort((a, b) => (b.lastUsedAt ?? 0) - (a.lastUsedAt ?? 0)).slice(0, 12);
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: t('main.trayShow'), click: () => showMainWindow() },
+    {
+      label: t('main.trayQuick'),
+      submenu: conns.length ? conns.map((c) => ({ label: c.name, click: () => openConnectionWindow(c.id) })) : [{ label: t('main.trayNone'), enabled: false }],
+    },
+    { type: 'separator' },
+    { label: t('main.trayQuit'), click: () => { quitting = true; app.quit(); } },
+  ]));
+}
+
+function applyOpenAtLogin() {
+  if (!app.isPackaged) return; // geliştirme sürümünü oturum açılışına ekleme
+  app.setLoginItemSettings({ openAtLogin: !!svc.store.data.settings.openAtLogin, args: ['--hidden'] });
 }
 
 function showMainWindow() {
@@ -210,6 +257,8 @@ function registerIpc() {
     Object.assign(s, patch);
     svc.store.save({ library: !quiet });
     if ('appTheme' in patch) applyAppTheme();
+    if ('openAtLogin' in patch) applyOpenAtLogin();
+    if ('minimizeToTray' in patch || 'closeToTray' in patch || 'language' in patch) updateTray();
     if ('language' in patch) {
       applyLanguage();
       mainWindow?.webContents.reload();
@@ -386,6 +435,25 @@ function registerIpc() {
 
   ipcMain.handle('history:list', (e) => svc.history.list(getSession(e).profileId));
   ipcMain.handle('shell:reveal', (_e, p: string) => shell.showItemInFolder(p));
+
+  // --- Ayarlar › Hakkında -----------------------------------------------------------
+  ipcMain.handle('app:about', () => ({
+    version: app.getVersion(), electron: process.versions.electron, chrome: process.versions.chrome, node: process.versions.node,
+  }));
+  ipcMain.handle('app:checkUpdate', async () => {
+    try {
+      const r = await svc.account.latestRelease();
+      const newer = !!r.version && compareVersions(r.version, app.getVersion()) > 0;
+      return { ok: true, version: r.version, newer };
+    } catch (e) {
+      return { ok: false, message: friendlyError(e, t) };
+    }
+  });
+  // Chromium lisansları exe'nin yanındaki LICENSES.chromium.html dosyasındadır
+  ipcMain.handle('app:openLicenses', () => {
+    const file = path.join(path.dirname(process.execPath), 'LICENSES.chromium.html');
+    if (fs.existsSync(file)) void shell.openPath(file);
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -434,8 +502,12 @@ if (!app.requestSingleInstanceLock()) {
     applyAppTheme();
     registerIpc();
     // "Beni hatırla" ile saklı oturum varsa doğrudan açılır (çevrimdışıyken yerel kütüphaneyle)
+    applyOpenAtLogin();
+    updateTray();
     if (svc.account.isLoggedIn()) {
-      createMainWindow();
+      // Windows açılışında (--hidden) ve tepsi açıksa pencere gizli başlar
+      const hidden = process.argv.includes('--hidden') && (svc.store.data.settings.minimizeToTray || svc.store.data.settings.closeToTray);
+      createMainWindow({ hidden });
       void svc.account.start();
     } else {
       createLoginWindow();
@@ -443,6 +515,7 @@ if (!app.requestSingleInstanceLock()) {
     app.on('activate', () => BrowserWindow.getAllWindows().length === 0 && showMainWindow());
   });
 
+  app.on('before-quit', () => (quitting = true));
   app.on('window-all-closed', () => {
     svc?.store.flush();
     app.quit();
