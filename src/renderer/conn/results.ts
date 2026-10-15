@@ -5,6 +5,8 @@ import { contextMenu, esc, formatNumber, h, icon, t } from '../lib/ui';
 import { Grid } from './grid';
 
 interface ResultSet {
+  /** Benzersiz anahtar: bir ifade (ör. SQL Server partisi) birden çok sonuç kümesi döndürebilir */
+  key: number;
   index: number;
   statement: string;
   columns: ColumnMeta[];
@@ -36,6 +38,8 @@ export class ResultsPanel {
   /** Satır gelince ızgarayı yeniden çizmeyi seyrekleştir */
   private pendingRender = false;
   private stmts = new Map<number, string>();
+  private seq = 0;
+  private last = (index: number) => [...this.sets].reverse().find((s) => s.index === index);
   private source = '';
   onExport: ((statement: string) => void) | null = null;
 
@@ -77,7 +81,7 @@ export class ResultsPanel {
   }
 
   currentStatement(): string {
-    const s = this.sets.find((x) => x.index === this.active);
+    const s = this.sets.find((x) => x.key === this.active);
     return s?.statement ?? '';
   }
 
@@ -94,27 +98,27 @@ export class ResultsPanel {
         this.stmts.set(ev.index, this.source ? this.source.slice(ev.start, ev.end) : ev.text);
         break;
       case 'columns': {
-        const set: ResultSet = { index: ev.index, statement: this.stmts.get(ev.index) ?? '', columns: ev.columns, rows: [], rowCount: 0, truncated: false, ms: 0, done: false };
+        const set: ResultSet = { key: ++this.seq, index: ev.index, statement: this.stmts.get(ev.index) ?? '', columns: ev.columns, rows: [], rowCount: 0, truncated: false, ms: 0, done: false };
         this.sets.push(set);
         this.summary.results++;
         this.renderTabs();
-        if (this.sets.length === 1) this.show(ev.index);
+        if (this.sets.length === 1) this.show(set.key);
         break;
       }
       case 'rows': {
-        const set = this.sets.find((s) => s.index === ev.index);
+        const set = this.last(ev.index);
         if (!set) break;
         for (const r of ev.rows) set.rows.push(r);
         set.rowCount = set.rows.length;
-        if (this.active === ev.index) this.grid.appendRows(ev.rows);
+        if (this.active === set.key) this.grid.appendRows(ev.rows);
         this.scheduleTabs();
         break;
       }
       case 'end': {
-        const set = this.sets.find((s) => s.index === ev.index);
+        const set = this.last(ev.index);
         if (set) Object.assign(set, { truncated: ev.truncated, ms: ev.ms, done: true, rowCount: ev.rowCount });
         this.message('ok', t(ev.truncated ? 'res.rowsTruncated' : 'res.rows', { n: formatNumber(ev.rowCount), ms: ev.ms }));
-        if (set && !set.rows.length && this.active === ev.index) this.grid.showEmpty(t('res.noRows'));
+        if (set && !set.rows.length && this.active === set.key) this.grid.showEmpty(t('res.noRows'));
         this.renderTabs();
         break;
       }
@@ -155,9 +159,9 @@ export class ResultsPanel {
   private renderTabs() {
     this.tabsEl.innerHTML = '';
     this.sets.forEach((s, i) => {
-      const b = h(`<button class="res-tab ${this.active === s.index ? 'on' : ''}">${icon('table')}${esc(t('res.result', { n: i + 1 }))}
+      const b = h(`<button class="res-tab ${this.active === s.key ? 'on' : ''}">${icon('table')}${esc(t('res.result', { n: i + 1 }))}
         <span class="res-count">${formatNumber(s.rowCount)}${s.truncated ? '+' : ''}</span></button>`);
-      b.onclick = () => this.show(s.index);
+      b.onclick = () => this.show(s.key);
       this.tabsEl.appendChild(b);
     });
     const m = h(`<button class="res-tab ${this.active === 'messages' ? 'on' : ''}">${icon('info')}${esc(t('res.messages'))}${this.summary.errors ? `<span class="res-count err">${this.summary.errors}</span>` : ''}</button>`);
@@ -171,7 +175,7 @@ export class ResultsPanel {
     this.messagesEl.classList.toggle('hidden', !isMsg);
     this.grid.el.classList.toggle('hidden', isMsg);
     if (!isMsg) {
-      const s = this.sets.find((x) => x.index === which);
+      const s = this.sets.find((x) => x.key === which);
       this.grid.setData(s?.columns ?? [], s ? [...s.rows] : []);
       this.grid.showEmpty(s && s.done && !s.rows.length ? t('res.noRows') : null);
     }

@@ -57,7 +57,9 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "shortcutName": "SQL Master"
+      "shortcutName": "SQL Master",
+      "include": "build/installer.nsh",
+      "menuCategory": "Mastertool"
     },
     "portable": {
       "artifactName": "SQL-Master-Portable-${version}.exe"

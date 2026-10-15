@@ -28,10 +28,10 @@ export async function findPath(conn: IDataSourceConnection, names: string[]): Pr
 }
 
 /** Uzun süren sorguyu başlatıp iptal eder; iptalin hızlı döndüğünü doğrular */
-export async function expectCancel(conn: IDataSourceConnection, longSql: string) {
+export async function expectCancel(conn: IDataSourceConnection, longSql: string, limit?: number) {
   const ac = new AbortController();
   const started = Date.now();
-  const p = run(conn, { sql: longSql }, ac.signal);
+  const p = run(conn, { sql: longSql, limit }, ac.signal);
   await new Promise((r) => setTimeout(r, 700));
   ac.abort();
   await conn.cancel();
