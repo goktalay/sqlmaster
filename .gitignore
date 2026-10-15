@@ -6,3 +6,4 @@ dist-app/
 .env
 .sqlm-parts.*
 coverage/
+e2e-shots/

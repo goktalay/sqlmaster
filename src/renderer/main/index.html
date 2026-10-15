@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+  <title>SQL Master</title>
+  <link rel="stylesheet" href="../common.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../../assets/icon.png" alt="">
+        <div>
+          <div class="brand-name">SQL Master</div>
+          <div class="brand-sub" id="stats"></div>
+        </div>
+      </div>
+      <div class="search">
+        <span class="search-ico"></span>
+        <input id="search" spellcheck="false">
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="btnTheme"></button>
+        <button class="btn ghost" id="btnSettings"></button>
+        <button class="btn" id="btnNewFolder"></button>
+        <button class="btn primary" id="btnNewConn"></button>
+        <button class="account-chip" id="btnAccount"><span class="ac-avatar"></span><span class="ac-sync"></span></button>
+      </div>
+    </header>
+
+    <div class="update-bar hidden" id="updateBar"></div>
+    <nav class="crumbs" id="crumbs"></nav>
+
+    <main class="content" id="content">
+      <div class="grid" id="grid"></div>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

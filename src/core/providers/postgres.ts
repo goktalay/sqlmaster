@@ -39,7 +39,9 @@ const isNoSslError = (e: unknown) => /does not support SSL|SSL off|no pg_hba.con
 class PgConnection implements IDataSourceConnection {
   readonly capabilities = CAPS;
   private clients = new Map<string, Promise<Client>>();
-  private typeNames = new Map<number, string>();
+  /** Veritabanı başına oid → tip adı (özel tiplerin oid'leri veritabanına göre değişir) */
+  private typeNames = new Map<string, Map<number, string>>();
+  private typesStale = new Set<string>();
   private active: { client: Client; cursor?: Cursor } | null = null;
   private readOnly: boolean;
   private tls = false;
@@ -124,16 +126,23 @@ class PgConnection implements IDataSourceConnection {
   }
 
   // --- Sorgu ------------------------------------------------------------------
-  private async typeName(oid: number, c: Client): Promise<string> {
-    if (!this.typeNames.size) {
-      const r = await c.query('select oid::int oid, format_type(oid, null) n from pg_type');
-      for (const row of r.rows as { oid: number; n: string }[]) this.typeNames.set(row.oid, row.n);
-    }
-    return this.typeNames.get(oid) ?? String(oid);
+  // Tip adları imleç açılmadan önce yüklenir: imleç sürerken aynı istemcide başka sorgu kuyrukta bekler (kilitlenir)
+  private async loadTypes(c: Client, db: string) {
+    const r = await c.query('select oid::int oid, format_type(oid, null) n from pg_type');
+    this.typeNames.set(db, new Map((r.rows as { oid: number; n: string }[]).map((x) => [x.oid, x.n])));
+    this.typesStale.delete(db);
+  }
+
+  private typeName(db: string, oid: number): string {
+    const n = this.typeNames.get(db)?.get(oid);
+    if (n === undefined) this.typesStale.add(db); // yeni oluşturulmuş tip: bir sonraki sorguda yenilenir
+    return n ?? String(oid);
   }
 
   async *query(sql: string, opts: QueryOptions): AsyncIterable<StatementEvent> {
-    const c = await this.client(opts.database);
+    const db = opts.database ?? this.defaultDb;
+    const c = await this.client(db);
+    if (!this.typeNames.has(db) || this.typesStale.has(db)) await this.loadTypes(c, db);
     const notices: string[] = [];
     const onNotice = (n: { message?: string; severity?: string }) => notices.push(`${n.severity ?? 'NOTICE'}: ${n.message ?? ''}`);
     c.on('notice', onNotice);
@@ -163,7 +172,7 @@ class PgConnection implements IDataSourceConnection {
             return;
           }
           const columns: ColumnMeta[] = [];
-          for (const f of fields) columns.push({ name: f.name, type: await this.typeName(f.dataTypeID, c), numeric: NUMERIC_OIDS.has(f.dataTypeID) });
+          for (const f of fields) columns.push({ name: f.name, type: this.typeName(db, f.dataTypeID), numeric: NUMERIC_OIDS.has(f.dataTypeID) });
           yield { type: 'columns', columns };
         }
         if (want <= 0) {
@@ -185,7 +194,15 @@ class PgConnection implements IDataSourceConnection {
     } finally {
       c.off('notice', onNotice);
       this.active = null;
-      await new Promise<void>((resolve) => cursor.close(() => resolve()));
+      // İmleç kapanmazsa (bağlantı bozulduysa) istemciyi bırak; sıradaki istek yeni istemci açar
+      const closed = await Promise.race([
+        new Promise<boolean>((resolve) => cursor.close(() => resolve(true))),
+        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 3000)),
+      ]);
+      if (!closed) {
+        this.clients.delete(db);
+        void c.end().catch(() => {});
+      }
     }
   }
 

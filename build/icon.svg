@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b2438"/>
+      <stop offset="0.55" stop-color="#0f1626"/>
+      <stop offset="1" stop-color="#090d17"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5eead4"/>
+      <stop offset="0.45" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0.10"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.10"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.32" cy="0.62" r="0.6">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0.85" cy="0.12" r="0.55">
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+
+  <!-- Zemin (SSH Master / FTP Masters ile ortak) -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#glow)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#glow2)"/>
+  <rect x="18" y="18" width="476" height="476" rx="110" fill="none" stroke="url(#rim)" stroke-width="4"/>
+
+  <!-- Veritabanı silindiri -->
+  <path d="M136 152 v208 c0 33 54 56 120 56 s120 -23 120 -56 V152" fill="url(#fill)" stroke="url(#accent)" stroke-width="22" stroke-linejoin="round"/>
+  <ellipse cx="256" cy="152" rx="120" ry="48" fill="#0f1626" stroke="url(#accent)" stroke-width="22"/>
+  <path d="M136 256 c0 33 54 56 120 56 s120 -23 120 -56" fill="none" stroke="url(#accent)" stroke-width="18" opacity="0.75"/>
+
+  <!-- Parlama + SQL istemi -->
+  <g filter="url(#soft)" opacity="0.55" fill="none" stroke="#22d3ee" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M206 344 l30 -24 -30 -24 M254 356 h56"/>
+  </g>
+  <g fill="none" stroke="url(#accent)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M206 344 l30 -24 -30 -24 M254 356 h56"/>
+  </g>
+</svg>

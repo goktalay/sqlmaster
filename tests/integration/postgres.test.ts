@@ -132,6 +132,17 @@ describe.skipIf(!enabled)('PostgreSQL provider', () => {
     expect(events.find((e) => e.type === 'end')).toMatchObject({ rowCount: 10_000, truncated: true });
   });
 
+  it('does not deadlock when the first batch exactly fills the limit on a fresh connection', async () => {
+    const fresh = await postgresProvider.connect(cfg);
+    try {
+      const ev = await run(fresh, { sql: 'select * from public.big limit 100', limit: 100 });
+      expect(rowsOf(ev)).toHaveLength(100);
+      expect(ev.find((e) => e.type === 'end')).toMatchObject({ rowCount: 100, truncated: false });
+    } finally {
+      await fresh.close();
+    }
+  });
+
   it('reports DML row counts, notices and errors', async () => {
     const ev = await run(conn, { sql: "create temp table t(a int); insert into t select generate_series(1,5); do $$ begin raise notice 'merhaba'; end $$; select 1/0; select 2" });
     expect(ev.filter((e) => e.type === 'command').map((e) => (e as { command: string }).command)).toEqual(['CREATE', 'INSERT', 'DO']);
