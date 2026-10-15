@@ -5,6 +5,7 @@ import { _electron as electron } from 'playwright-core';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const shots = process.env.SQLM_SHOTS || path.join(root, 'e2e-shots');
@@ -12,6 +13,9 @@ fs.mkdirSync(shots, { recursive: true });
 const [host, port, user, pass, db] = (process.env.SQLM_E2E_PG || '127.0.0.1:55432:postgres:secret:shop').split(':');
 const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'sqlm-e2e-'));
 const electronPath = path.join(root, 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
+
+// Electron ikilisi ilk kullanımda indirilir (npm postinstall yok): yoksa indir
+if (!fs.existsSync(electronPath)) execFileSync(process.execPath, [path.join(root, 'node_modules', 'electron', 'install.js')], { stdio: 'inherit' });
 
 const assert = (cond, msg) => { if (!cond) throw new Error('ASSERT: ' + msg); console.log('  ✓ ' + msg); };
 
