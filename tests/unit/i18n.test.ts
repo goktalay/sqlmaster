@@ -4,6 +4,7 @@ import path from 'node:path';
 import { tr } from '../../src/shared/locales/tr';
 import { en } from '../../src/shared/locales/en';
 import { FILTER_OPS } from '../../src/core/sql/gridQuery';
+import { LANGUAGES, STRINGS, resolveLanguage } from '../../src/shared/i18n';
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? sourceFiles(path.join(dir, e.name)) : e.name.endsWith('.ts') ? [path.join(dir, e.name)] : []));
@@ -29,5 +30,22 @@ describe('i18n', () => {
     expect(Object.keys(en).filter((k) => !(k in tr))).toEqual([]);
     const ph = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
     expect(Object.keys(tr).filter((k) => ph(tr[k]) !== ph(en[k]))).toEqual([]);
+  });
+
+  it('all 8 languages have the same keys, placeholders and tags as English', () => {
+    expect(Object.keys(LANGUAGES)).toEqual(['tr', 'en', 'fr', 'de', 'es', 'ar', 'zh', 'ru']);
+    const sig = (s: string) => [...[...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort(), ...[...s.matchAll(/<\/?\w+>/g)].map((m) => m[0]).sort()].join(',');
+    for (const lang of Object.keys(LANGUAGES)) {
+      const d = STRINGS[lang];
+      expect(Object.keys(en).filter((k) => !(k in d)), lang).toEqual([]);
+      expect(Object.keys(d).filter((k) => !(k in en)), lang).toEqual([]);
+      expect(Object.keys(en).filter((k) => sig(d[k]) !== sig(en[k]) || !d[k].trim()), lang).toEqual([]);
+    }
+  });
+
+  it('falls back to English for unsupported system languages', () => {
+    expect(resolveLanguage('ar-SA')).toBe('ar');
+    expect(resolveLanguage('zh-CN')).toBe('zh');
+    expect(resolveLanguage('ja-JP')).toBe('en');
   });
 });
