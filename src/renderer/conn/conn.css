@@ -300,3 +300,10 @@ body.resizing-row, body.resizing-row * { cursor: row-resize !important; user-sel
 .spin { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
+
+/* --- Sağdan sola diller: SQL, sonuçlar, tanımlar ve yollar her zaman soldan sağa --------- */
+[dir="rtl"] .cm-editor, [dir="rtl"] .grid-wrap, [dir="rtl"] .sql-preview, [dir="rtl"] .qb-canvas-wrap, [dir="rtl"] .qb-sql,
+[dir="rtl"] .res-messages pre, [dir="rtl"] .tdetail, [dir="rtl"] .site-sub, [dir="rtl"] .code-name, [dir="rtl"] .code-detail,
+[dir="rtl"] .exp-sql, [dir="rtl"] .hist-row pre, [dir="rtl"] .value-view, [dir="rtl"] .fchip code, [dir="rtl"] .qb-grid .mono { direction: ltr; }
+[dir="rtl"] .tnode.open > .trow .tchev svg.i { transform: rotate(90deg); }
+[dir="rtl"] .tchev svg.i { transform: scaleX(-1); }

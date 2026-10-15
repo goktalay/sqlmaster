@@ -51,7 +51,7 @@ export function themeButton(btn: HTMLElement) {
 }
 
 export async function openSettings(s: Settings) {
-  let appTheme = s.appTheme || 'dark';
+  let appTheme = s.appTheme || 'system';
   const originalTheme = appTheme;
   const langOptions = Object.entries(LANGUAGES).map(([code, l]) => `<option value="${code}" ${code === LANG ? 'selected' : ''}>${esc(l.name)}</option>`).join('');
   const body = h(`<div style="display:grid;gap:16px">

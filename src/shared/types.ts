@@ -69,7 +69,8 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  appTheme: 'dark',
+  // Mastertool ortak standardı: varsayılan tema Sistem
+  appTheme: 'system',
   language: null,
   rowLimit: 10_000,
   previewRows: 100,

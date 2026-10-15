@@ -29,7 +29,7 @@ const applyLanguage = () => (t = createT(currentLang()));
 // ---------------------------------------------------------------------------
 function applyAppTheme() {
   const v = svc.store.data.settings.appTheme;
-  nativeTheme.themeSource = v === 'light' || v === 'system' ? v : 'dark';
+  nativeTheme.themeSource = v === 'light' || v === 'dark' ? v : 'system';
 }
 const windowBg = () => (nativeTheme.shouldUseDarkColors ? '#0b0f17' : '#eef2f7');
 
