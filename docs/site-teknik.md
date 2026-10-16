@@ -172,4 +172,5 @@ Varsayılan dil işletim sistemi dilidir, desteklenmiyorsa İngilizce. Tema: Gec
 
 | Sürüm | Tarih | Öne çıkanlar |
 |---|---|---|
+| 0.2.0 | 16 Ekim 2026 | Mastertool ortak oturumu (bir uygulamada giriş/çıkış tüm Mastertool uygulamalarına yansır), İngilizce arayüzde tekil/çoğul düzeltmeleri |
 | 0.1.0 | 15 Ekim 2026 | İlk sürüm: PostgreSQL, SQL Server, MySQL/MariaDB, SQLite, DuckDB; nesne gezgini, SQL editörü, görsel sorgu oluşturucu, salt okunur kip, SSH tüneli, şifreli senkron, 8 dil |

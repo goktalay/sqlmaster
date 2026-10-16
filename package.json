@@ -1,7 +1,7 @@
 {
   "name": "sql-master",
   "productName": "SQL Master",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Çok veritabanlı SQL istemcisi: bağlantı kütüphanesi, nesne ağacı, SQL editörü, görsel sorgu oluşturucu",
   "main": "dist-app/main/main.js",
   "author": "SQL Master",
