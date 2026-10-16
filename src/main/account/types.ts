@@ -22,12 +22,25 @@ export interface IAccountService {
   checkUpdate(): Promise<void>;
   /** Ayarlar › Hakkında › Güncellemeleri denetle */
   latestRelease(): Promise<{ version: string | null; notes?: string }>;
+  /** Ortak oturum (sso.ts): kendi oturumu yokken cihazdaki ortak kimlikle şifresiz giriş dener */
+  trySso(): Promise<SsoResult>;
+  /** Ortak oturum durumunu izlemeye başlar (başka uygulamada giriş/çıkış) */
+  startWatching(): void;
+  stopWatching(): void;
+}
+
+export interface SsoResult {
+  ok: boolean;
+  code?: string;
+  backupFile?: string | null;
 }
 
 export interface AccountEvents {
   onStatus(st: AccountState): void;
   onSessionExpired(code: string): void;
   onUpdate(info: UpdateInfo): void;
+  /** Başka bir Mastertool uygulamasındaki girişle şifresiz oturum açıldı */
+  onSignedIn?(backupFile: string | null): void;
 }
 
 export class AccountError extends Error {

@@ -4,11 +4,14 @@ import path from 'node:path';
 import { tr } from '../../src/shared/locales/tr';
 import { en } from '../../src/shared/locales/en';
 import { FILTER_OPS } from '../../src/core/sql/gridQuery';
-import { LANGUAGES, STRINGS, resolveLanguage } from '../../src/shared/i18n';
+import { LANGUAGES, STRINGS, createT, resolveLanguage } from '../../src/shared/i18n';
 
 function sourceFiles(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? sourceFiles(path.join(dir, e.name)) : e.name.endsWith('.ts') ? [path.join(dir, e.name)] : []));
 }
+
+// "<anahtar>_one" tekil biçimleri isteğe bağlıdır (dilin kendi çoğul kuralına göre); eşitlik denetiminde sayılmaz
+const keys = (d: Record<string, string>) => Object.keys(d).filter((k) => !k.endsWith('_one'));
 
 describe('i18n', () => {
   const used = new Set<string>();
@@ -26,10 +29,10 @@ describe('i18n', () => {
   });
 
   it('Turkish and English have the same keys and placeholders', () => {
-    expect(Object.keys(tr).filter((k) => !(k in en))).toEqual([]);
-    expect(Object.keys(en).filter((k) => !(k in tr))).toEqual([]);
+    expect(keys(tr).filter((k) => !(k in en))).toEqual([]);
+    expect(keys(en).filter((k) => !(k in tr))).toEqual([]);
     const ph = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
-    expect(Object.keys(tr).filter((k) => ph(tr[k]) !== ph(en[k]))).toEqual([]);
+    expect(keys(tr).filter((k) => ph(tr[k]) !== ph(en[k]))).toEqual([]);
   });
 
   it('all 8 languages have the same keys, placeholders and tags as English', () => {
@@ -37,10 +40,19 @@ describe('i18n', () => {
     const sig = (s: string) => [...[...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort(), ...[...s.matchAll(/<\/?\w+>/g)].map((m) => m[0]).sort()].join(',');
     for (const lang of Object.keys(LANGUAGES)) {
       const d = STRINGS[lang];
-      expect(Object.keys(en).filter((k) => !(k in d)), lang).toEqual([]);
-      expect(Object.keys(d).filter((k) => !(k in en)), lang).toEqual([]);
-      expect(Object.keys(en).filter((k) => sig(d[k]) !== sig(en[k]) || !d[k].trim()), lang).toEqual([]);
+      expect(keys(en).filter((k) => !(k in d)), lang).toEqual([]);
+      expect(keys(d).filter((k) => !(k in en)), lang).toEqual([]);
+      expect(keys(en).filter((k) => sig(d[k]) !== sig(en[k]) || !d[k].trim()), lang).toEqual([]);
+      // Tekil biçim yalnız var olan bir anahtar için ve aynı yer tutucularla tanımlanabilir
+      expect(Object.keys(d).filter((k) => k.endsWith('_one') && (!(k.slice(0, -4) in d) || sig(d[k]) !== sig(d[k.slice(0, -4)]))), lang).toEqual([]);
     }
+  });
+
+  it('uses the singular form when n = 1', () => {
+    const t = createT('en');
+    expect(t('app.folderCount', { n: 1 })).toBe('1 connection');
+    expect(t('app.folderCount', { n: 2 })).toBe('2 connections');
+    expect(createT('tr')('app.folderCount', { n: 1 })).toBe(tr['app.folderCount'].replace('{n}', '1'));
   });
 
   it('falls back to English for unsupported system languages', () => {

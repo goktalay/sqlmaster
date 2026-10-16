@@ -9,7 +9,7 @@ const root = path.resolve(import.meta.dirname, '..');
 const out = path.join(root, 'dist-app');
 const watch = process.argv.includes('--watch');
 
-const external = ['electron', 'pg', 'pg-cursor', 'pg-native', 'mssql', 'tedious', 'mysql2', '@duckdb/node-api', 'ssh2', 'cpu-features'];
+const external = ['electron', 'pg', 'pg-cursor', 'pg-native', 'mssql', 'tedious', 'mysql2', '@duckdb/node-api', 'ssh2', 'cpu-features', '@napi-rs/keyring'];
 
 const node = {
   bundle: true, platform: 'node', format: 'cjs', target: 'node24', sourcemap: 'linked', external, logLevel: 'info',

@@ -45,6 +45,7 @@ export const tr: Record<string, string> = {
   'auth.errUnverified': 'E-posta adresiniz henüz doğrulanmadı. Gelen kutunuzdaki bağlantıya tıklayın.', 'auth.errSuspended': 'Hesabınız askıya alınmış.',
   'auth.errRateLimited': 'Çok fazla deneme yapıldı. Bir dakika sonra tekrar deneyin.', 'auth.errOffline': 'Sunucuya ulaşılamıyor. İnternet bağlantınızı kontrol edin.',
   'auth.errSessionExpired': 'Oturumunuzun süresi doldu ya da şifreniz değişti. Lütfen yeniden giriş yapın.',
+  'auth.signedOutElsewhere': 'Başka bir Mastertool uygulamasında çıkış yapıldı. Yerel bağlantılarınız bu bilgisayarda duruyor.',
   'auth.errAppDisabled': 'Hesabınızda SQL Master kapalı. Destek için: mastertool.download > Hesabım > Destek.',
   'auth.errWrongApp': 'Bu oturum başka bir uygulamaya ait. Lütfen SQL Master için yeniden giriş yapın.', 'auth.errServer': 'Giriş yapılamadı: {msg}',
   'auth.devNotice': 'Geliştirme kipi: Mastertool sunucusu yerine yerel hesap kullanılıyor (herhangi bir e-posta/şifre kabul edilir, senkron yok).',

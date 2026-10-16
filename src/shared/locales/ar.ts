@@ -44,6 +44,7 @@ export const ar: Record<string, string> = {
   'auth.errUnverified': 'لم يتم التحقق من بريدك الإلكتروني بعد. انقر الرابط في صندوق الوارد.', 'auth.errSuspended': 'حسابك موقوف.',
   'auth.errRateLimited': 'محاولات كثيرة جدًا. حاول مجددًا بعد دقيقة.', 'auth.errOffline': 'تعذّر الوصول إلى الخادم. تحقّق من اتصالك بالإنترنت.',
   'auth.errSessionExpired': 'انتهت جلستك أو تغيّرت كلمة المرور. يرجى تسجيل الدخول مجددًا.',
+  'auth.signedOutElsewhere': 'تم تسجيل الخروج في تطبيق Mastertool آخر. لا تزال اتصالاتك المحلية على هذا الكمبيوتر.',
   'auth.errAppDisabled': 'تم تعطيل SQL Master لحسابك. الدعم: mastertool.download > حسابي > الدعم.',
   'auth.errWrongApp': 'هذه الجلسة تخص تطبيقًا آخر. يرجى تسجيل الدخول إلى SQL Master مجددًا.', 'auth.errServer': 'تعذّر تسجيل الدخول: {msg}',
   'auth.devNotice': 'وضع التطوير: يُستخدم حساب محلي بدلًا من خادم Mastertool (أي بريد إلكتروني/كلمة مرور، دون مزامنة).',
