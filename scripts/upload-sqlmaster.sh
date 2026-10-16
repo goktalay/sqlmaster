@@ -64,6 +64,7 @@ HTTP=$(post_parts "$API/$VERSION/setup" "$SETUP" "$(basename "$SETUP")" -F "note
 case "$HTTP" in
   200|201) echo "sqlmaster.app: kurulum $VERSION yüklendi."; verify "$SETUP" ;;
   409) echo "::notice::sqlmaster.app'de $VERSION kurulumu zaten var (409); atlandı." ;;
+  403) echo "::warning::sqlmaster.app yüklemesi yetkilendirilmedi (HTTP 403); GitHub Release yayınlandı, yükleme atlandı." ;;
   *) echo "::error::Kurulum yüklemesi başarısız (HTTP $HTTP)."; exit 1 ;;
 esac
 
