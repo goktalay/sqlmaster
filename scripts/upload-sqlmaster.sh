@@ -18,10 +18,14 @@ PORTABLE="${4:-}"
 API="${SQLM_API:-https://sqlmaster.app}/api/sq/releases"
 PART_BYTES="${SQLM_PART_BYTES:-90000000}"     # test için küçültülebilir
 
-if [ -z "${SQLM_RELEASE_KEY:-}" ]; then
+# Kopyala-yapıştırda kalan baştaki/sondaki boşluk ve satır sonları anahtarı geçersiz kılmasın
+SQLM_RELEASE_KEY="$(printf '%s' "${SQLM_RELEASE_KEY:-}" | tr -d '[:space:]')"
+if [ -z "$SQLM_RELEASE_KEY" ]; then
   echo "::warning::SQLM_RELEASE_KEY tanımlı değil; sqlmaster.app'e yükleme atlandı."
   exit 0
 fi
+# Teşhis için yalnızca uzunluk yazılır (değer asla yazılmaz)
+echo "Yükleme anahtarı: ${#SQLM_RELEASE_KEY} karakter"
 
 post() { # post <url> <curl -F argümanları...>  → HTTP kodu; gövde response.json'a
   local url="$1"; shift
