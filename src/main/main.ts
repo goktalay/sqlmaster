@@ -8,6 +8,7 @@ import type { ConnectionForm, ConnectionProfile, Settings } from '../shared/type
 import type { ConnectionConfig, NodePath, TreeNode } from '../core/provider';
 import type { ExecuteRequest } from '../core/engine/executor';
 import type { ExportFormat } from '../core/engine/export';
+import type { ReportDef } from '../core/report/model';
 import { createSso, systemKeyring } from './account/sso';
 import { createServices, type Services } from './container';
 import { secretRef } from './store';
@@ -204,6 +205,21 @@ function openConnectionWindow(id: string) {
     sessions.delete(wcId);
     host.request('close', {}).catch(() => {}).finally(() => setTimeout(() => host.kill(), 500));
   });
+}
+
+/** Rapor HTML'ini görünmez, betiksiz bir pencerede açıp yazdırır ya da PDF'e çevirir */
+async function withPrintWindow<T>(html: string, fn: (wc: WebContents) => Promise<T>): Promise<T> {
+  const file = path.join(app.getPath('temp'), `sqlmaster-rapor-${process.pid}-${Date.now()}.html`);
+  fs.writeFileSync(file, String(html ?? ''), 'utf8');
+  const w = new BrowserWindow({ show: false, webPreferences: { javascript: false, sandbox: true, contextIsolation: true } });
+  w.webContents.on('will-navigate', (ev) => ev.preventDefault());
+  try {
+    await w.loadFile(file);
+    return await fn(w.webContents);
+  } finally {
+    w.destroy();
+    fs.rmSync(file, { force: true });
+  }
 }
 
 function getSession(e: IpcMainInvokeEvent): ConnSession {
@@ -447,6 +463,27 @@ function registerIpc() {
   }));
 
   ipcMain.handle('history:list', (e) => svc.history.list(getSession(e).profileId));
+
+  // --- Baskı raporları -------------------------------------------------------------
+  ipcMain.handle('report:list', (e) => svc.store.reportsOf(getSession(e).profileId));
+  ipcMain.handle('report:save', (e, def: Partial<ReportDef>) => svc.store.saveReport(getSession(e).profileId, def));
+  ipcMain.handle('report:delete', (e, id: string) => svc.store.deleteReport(getSession(e).profileId, String(id)));
+  ipcMain.handle('report:print', wrap(async (e, { html }: { html: string }) => {
+    getSession(e);
+    return withPrintWindow(html, (wc) => new Promise<boolean>((resolve, reject) => {
+      wc.print({ silent: false, printBackground: true }, (ok, reason) => (ok || /cancel/i.test(reason) ? resolve(ok) : reject(new Error(reason))));
+    }));
+  }));
+  ipcMain.handle('report:pdf', wrap(async (e, { html, name }: { html: string; name: string }) => {
+    getSession(e);
+    const win = BrowserWindow.fromWebContents(e.sender)!;
+    const safe = String(name || 'rapor').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 120);
+    const r = await dialog.showSaveDialog(win, { defaultPath: `${safe}.pdf`, filters: [{ name: 'PDF', extensions: ['pdf'] }] });
+    if (r.canceled || !r.filePath) return null;
+    const pdf = await withPrintWindow(html, (wc) => wc.printToPDF({ printBackground: true, preferCSSPageSize: true }));
+    fs.writeFileSync(r.filePath, pdf);
+    return r.filePath;
+  }));
   ipcMain.handle('shell:reveal', (_e, p: string) => shell.showItemInFolder(p));
 
   // --- Ayarlar › Hakkında -----------------------------------------------------------

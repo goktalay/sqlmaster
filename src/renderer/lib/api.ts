@@ -4,6 +4,7 @@ import type { ProviderMeta } from '../../shared/providers';
 import type { ColumnMeta, CompletionSchema, NodePath, ServerInfo, TreeNode } from '../../core/provider';
 import type { ExecEvent, ExecuteRequest } from '../../core/engine/executor';
 import type { ExportFormat, ExportResult } from '../../core/engine/export';
+import type { ReportDef } from '../../core/report/model';
 
 type Unsub = () => void;
 
@@ -63,6 +64,11 @@ export interface Api {
   dbSetReadOnly(on: boolean): Promise<boolean>;
   dbExport(p: { runId: string; sql: string; database?: string; format: ExportFormat; defaultName: string }): Promise<(ExportResult & { filePath: string }) | null>;
   historyList(): Promise<HistoryEntry[]>;
+  reportList(): Promise<ReportDef[]>;
+  reportSave(def: Partial<ReportDef>): Promise<ReportDef>;
+  reportDelete(id: string): Promise<void>;
+  reportPrint(html: string): Promise<boolean>;
+  reportPdf(html: string, name: string): Promise<string | null>;
   reveal(path: string): Promise<void>;
   onDbEvent(cb: (m: { runId: string; ev: ExecEvent }) => void): Unsub;
   onDbProgress(cb: (m: { runId: string; rows: number }) => void): Unsub;

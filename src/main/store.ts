@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import type { ProviderId, SslMode } from '../core/provider';
 import { DEFAULT_SETTINGS, type ConnectionForm, type ConnectionProfile, type Folder, type PublicConnection, type PublicStore, type Settings } from '../shared/types';
 import type { ISecretStore } from './secrets';
+import { normalizeReport, type ReportDef } from '../core/report/model';
 
 export interface SyncMetaEntry {
   kind: string;
@@ -20,6 +21,8 @@ export interface StoreData {
   connections: ConnectionProfile[];
   settings: Settings;
   syncMeta: Record<string, SyncMetaEntry>;
+  /** Baskı raporları (bağlantıya bağlı; şimdilik yalnız bu cihazda, senkronlanmaz) */
+  reports: ReportDef[];
 }
 
 export const secretRef = {
@@ -47,10 +50,10 @@ export class Store {
   onChange: () => void = () => {};
 
   constructor(private file: string, private secrets: ISecretStore) {
-    this.data = { folders: [], connections: [], settings: { ...DEFAULT_SETTINGS }, syncMeta: {} };
+    this.data = { folders: [], connections: [], settings: { ...DEFAULT_SETTINGS }, syncMeta: {}, reports: [] };
     try {
       const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
-      this.data = { ...this.data, ...raw, settings: { ...DEFAULT_SETTINGS, ...(raw.settings || {}) } };
+      this.data = { ...this.data, ...raw, settings: { ...DEFAULT_SETTINGS, ...(raw.settings || {}) }, reports: Array.isArray(raw.reports) ? raw.reports : [] };
     } catch { /* ilk açılış */ }
   }
 
@@ -134,8 +137,27 @@ export class Store {
     return p.id;
   }
 
+  // --- Raporlar ------------------------------------------------------------------------
+  reportsOf(connectionId: string): ReportDef[] {
+    return this.data.reports.filter((r) => r.connectionId === connectionId).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  saveReport(connectionId: string, raw: Partial<ReportDef> & { id?: string }): ReportDef {
+    const prev = raw.id ? this.data.reports.find((r) => r.id === raw.id && r.connectionId === connectionId) : undefined;
+    const def = normalizeReport({ ...raw, id: prev?.id ?? uid(), connectionId, createdAt: prev?.createdAt ?? Date.now() });
+    this.data.reports = [...this.data.reports.filter((r) => r.id !== def.id), def];
+    this.save({ library: false });
+    return def;
+  }
+
+  deleteReport(connectionId: string, id: string): void {
+    this.data.reports = this.data.reports.filter((r) => !(r.id === id && r.connectionId === connectionId));
+    this.save({ library: false });
+  }
+
   deleteConnection(id: string): void {
     this.data.connections = this.data.connections.filter((c) => c.id !== id);
+    this.data.reports = this.data.reports.filter((r) => r.connectionId !== id);
     this.secrets.deletePrefix(secretRef.prefix(id));
     this.save();
   }

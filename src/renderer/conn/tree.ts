@@ -163,6 +163,7 @@ export class ObjectTree {
       hasDdl && { label: isRel ? t('cw.showDdl') : t('cw.openCode'), icon: 'code', action: () => this.ctx.openCode(n) },
       isRel && { label: t('cw.selectSql'), icon: 'sql', action: () => this.ctx.openSql(`SELECT *\nFROM ${this.qualifiedName(n)}`, n.path.database) },
       isRel && { label: t('cw.addToBuilder'), icon: 'builder', action: () => this.ctx.openBuilder(n) },
+      isRel && { label: t('rep.fromTable'), icon: 'report', action: () => this.ctx.addReport(n) },
       (n.kind === 'database' || n.kind === 'schema') && { label: t('cw.newSqlHere'), icon: 'sql', action: () => this.ctx.openSql('', n.path.database) },
       '-',
       { label: t('cw.copyName'), icon: 'copy', action: () => { void api.clipboardWrite(isRel || n.openAs ? this.qualifiedName(n) : n.name); toast(t('cw.copied'), { type: 'ok' }); } },

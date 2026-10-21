@@ -1,6 +1,7 @@
 // Bağlantı penceresinin paylaşılan durumu.
 import type { CompletionSchema, ServerInfo, SqlDialect, TreeNode } from '../../core/provider';
 import type { PublicConnection, Settings } from '../../shared/types';
+import type { ReportDef } from '../../core/report/model';
 import { providerMeta } from '../../shared/providers';
 import { api } from '../lib/api';
 
@@ -32,6 +33,10 @@ export interface Ctx {
   openCode(node: TreeNode): void;
   /** Sorgu oluşturucuyu açar; düğüm verilirse tuvale ekler */
   openBuilder(node?: TreeNode): void;
+  /** Kayıtlı raporu tasarım sekmesinde açar */
+  openReport(def: ReportDef): void;
+  /** "Rapor ekle" sihirbazı; tablo verilirse önceden seçilir */
+  addReport(table?: TreeNode): void;
   completion(database?: string): Promise<CompletionSchema | null>;
   setStatus(text: string): void;
 }

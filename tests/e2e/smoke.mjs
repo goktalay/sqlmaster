@@ -160,6 +160,34 @@ try {
   assert(true, 'üretilen SQL çalıştı');
   await shot(cw, '11-sorgu-olusturucu');
 
+  // --- Rapor ekle: gruplu döküm şablonu → önizleme → PDF
+  await cw.click('#btnReport');
+  await cw.waitForSelector('.rw-tpl[data-t="grouped"]');
+  await cw.click('.rw-tpl[data-t="grouped"]');
+  await cw.click('.rw-list .pick-item:has(span:text-is("orders"))');
+  await shot(cw, '11a-rapor-ekle');
+  await cw.click('.modal .btn.primary');
+  await cw.waitForSelector('.report-tab:not(.hidden) iframe:not(.hidden)', { timeout: 20000 });
+  const srcdoc = () => cw.evaluate(() => document.querySelector('.report-tab:not(.hidden) iframe')?.srcdoc || '');
+  await cw.waitForFunction(() => (document.querySelector('.report-tab:not(.hidden) iframe')?.srcdoc || '').includes('class="gh"'));
+  assert((await srcdoc()).includes('Ara toplam'), 'gruplu rapor önizlemesinde grup başlıkları ve ara toplamlar var');
+  assert(await cw.locator('.rep-panel .rep-item').count() === 1, '"Raporlar" bölümünde yeni rapor listelendi');
+  await cw.waitForTimeout(400);
+  await shot(cw, '11b-rapor-tasarimi');
+  await cw.click('.report-tab:not(.hidden) .rp-layouts button[data-layout="summary"]');
+  await cw.waitForFunction(() => (document.querySelector('.report-tab:not(.hidden) iframe')?.srcdoc || '').includes('class="kpi"'));
+  assert(true, 'düzen "Özet"e çevrilince önizleme güncellendi');
+  const pdfPath = path.join(userData, 'rapor.pdf');
+  await app.evaluate(({ dialog }, p) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: p }); }, pdfPath);
+  await cw.click('.report-tab:not(.hidden) [data-a="pdf"]');
+  for (let i = 0; i < 100 && !fs.existsSync(pdfPath); i++) await cw.waitForTimeout(100);
+  const pdf = fs.readFileSync(pdfPath);
+  assert(pdf.subarray(0, 5).toString() === '%PDF-' && pdf.length > 5000, `PDF üretildi (${pdf.length} bayt)`);
+  fs.copyFileSync(pdfPath, path.join(shots, 'rapor.pdf'));
+  await cw.keyboard.press('Control+s');
+  await cw.waitForSelector('.toast:has-text("Rapor kaydedildi")');
+  assert(true, 'rapor kaydedildi');
+
   // --- Gündüz teması
   await cw.click('#btnTheme');
   await cw.emulateMedia({ colorScheme: 'light' });

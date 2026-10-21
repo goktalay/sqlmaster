@@ -6,6 +6,8 @@ SQLite ve DuckDB üzerinden CSV/Parquet/JSON/Excel dosyalarına bağlanır.
 - **Ana ekran:** "Bağlantı ekle" kartı, bağlantı kartları, sürükle-bırak klasörler, arama
 - **Bağlantı penceresi:** lazy nesne ağacı, sekmeli SQL editörü (Ctrl+Enter, otomatik tamamlama, çoklu sonuç, iptal),
   tablo verisi (kolon gizle/sırala/filtre → SQL canlı güncellenir), kod/DDL editörü, görsel sorgu oluşturucu
+- **Baskı raporları:** "Rapor ekle" şablonları (liste, gruplu döküm, özet, kart/etiket) seçilen tablodan baskıya hazır
+  sorgu üretir; kolon başlığı/biçim/toplam, sayfa boyutu/yönü, başlık ve alt bilgi; canlı önizleme, yazdırma ve PDF
 - **Güvenlik:** parolalar yalnız OS anahtar zincirinde, TLS varsayılan, bağlantı başına salt okunur kip (varsayılan açık),
   SSH tünel, log/geçmişte parola yok
 - **Hesap:** Mastertool girişi zorunlu, uçtan uca şifreli bağlantı kütüphanesi senkronu

@@ -12,6 +12,8 @@ import { createSqlTab } from './sqlTab';
 import { createDataTab } from './dataTab';
 import { createCodeTab } from './codeTab';
 import { createBuilderTab } from './builderTab';
+import { createReportTab } from './reportTab';
+import { openReportWizard, ReportsPanel } from './reports';
 import { splitter } from './split';
 
 const tabs: Tab[] = [];
@@ -45,6 +47,20 @@ async function main() {
       } else activateTab(builder.id);
       if (node) builder.addNode(node);
     },
+    openReport: (def) => {
+      if (activateTab(`report:${def.id}`)) return;
+      openTab(createReportTab(ctx, def, {
+        onSaved: () => void reports.reload(),
+        onDelete: (d) => reports.remove(d),
+      }));
+    },
+    addReport: (table) => {
+      void openReportWizard(ctx, table).then(async (def) => {
+        if (!def) return;
+        await reports.reload();
+        ctx.openReport(def);
+      }).catch((e) => toast((e as Error).message, { type: 'err' }));
+    },
     completion: makeCompletion(() => ctx.defaultDatabase),
     setStatus: (text) => ($('#stMsg').textContent = text),
   };
@@ -57,6 +73,7 @@ async function main() {
   $('#btnNewSql').innerHTML = icon('sql') + esc(t('cw.newSql'));
   $('#btnNewSql').title = 'Ctrl+T';
   $('#btnBuilder').innerHTML = icon('builder') + esc(t('cw.builder'));
+  $('#btnReport').innerHTML = icon('report') + esc(t('rep.add'));
   $('#btnReconnect').innerHTML = icon('reconnect') + esc(t('cw.reconnect'));
   $('#btnSettings').innerHTML = icon('gear');
   $('#btnSettings').title = t('app.settings');
@@ -64,6 +81,7 @@ async function main() {
   $('.bar-actions').appendChild(mastertoolButton());
   $('#btnNewSql').onclick = () => ctx.openSql();
   $('#btnBuilder').onclick = () => ctx.openBuilder();
+  $('#btnReport').onclick = () => ctx.addReport();
   $('#btnReconnect').onclick = () => void connect();
   $('#btnSettings').onclick = async () => { await openSettings(ctx.settings); };
   api.onStoreChanged((s: PublicStore) => { ctx.settings = s.settings; });
@@ -87,6 +105,8 @@ async function main() {
   paintRo();
 
   // --- Gövde ------------------------------------------------------------------------
+  const reports = new ReportsPanel(ctx);
+  $('#treeHost').appendChild(reports.el);
   const tree = new ObjectTree(ctx);
   $('#treeHost').appendChild(tree.el);
   $('#treeHost').style.width = `${settings.treeWidth || 300}px`;
@@ -129,6 +149,7 @@ async function main() {
     $('#stServer').innerHTML = `${icon('server')}${esc(r.info.product)}${meta.kind === 'server' ? (r.info.tls ? ` · ${icon('lock')}TLS` : ` · <span class="warn">${icon('unlock')}${esc(t('cw.noTls'))}</span>`) : ''}`;
     $('#stDb').innerHTML = r.info.database ? `${icon('database')}${esc(r.info.database)}${r.info.user ? ` · ${icon('user')}${esc(r.info.user)}` : ''}` : '';
     resetCompletion();
+    void reports.reload();
     await tree.reload();
     return true;
   }
